@@ -1,253 +1,1190 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  ArrowRight,
-  BookOpen,
-  BrainCircuit,
-  CheckCircle2,
-  ChevronDown,
-  Code2,
-  Database,
-  Download,
-  ExternalLink,
-  Layers3,
-  Mail,
-  Menu,
-  MessageSquareText,
-  Moon,
-  Quote,
-  SearchCheck,
-  ShieldCheck,
-  Sparkles,
-  TestTube2,
-  X,
-  Zap
+  ArrowRight, BookOpen, BrainCircuit, CheckCircle2, ChevronDown,
+  Code2, Database, Download, ExternalLink, Layers3, Mail, Menu,
+  MessageSquareText, Quote, SearchCheck, ShieldCheck, TestTube2,
+  X, Zap, ArrowUpRight, Cpu, GitBranch, Play,
+  Globe, Table, Cloud, Webhook,
 } from 'lucide-react';
+import {
+  siPython, siPytest, siSelenium,
+  siPostman,
+  siMysql, siPostgresql, siMongodb, siNeo4j, siPhpmyadmin,
+  siAirbyte, siOpensearch, siElasticsearch,
+  siArgo, siDocker, siGit, siLinux,
+  siJira, siTestrail, siApachejmeter,
+  siStripe, siAndroid, siIos,
+} from 'simple-icons';
 import './styles.css';
 
+/* ─────────────────────────────────────────────────────────────────
+   NAV
+───────────────────────────────────────────────────────────────── */
 const navItems = [
-  ['home', 'Home'],
-  ['work', 'Work'],
+  ['home',       'Home'],
+  ['work',       'Work'],
   ['experience', 'Experience'],
-  ['learning', 'Learning'],
-  ['about', 'About'],
-  ['contact', 'Ask Ankita']
+  ['skills',     'Skills'],
+  ['learning',   'Growth'],
+  ['resume',     'Resume'],
 ];
 
-const skills = [
-  'Quality strategy', 'API testing', 'Database validation', 'ETL testing',
-  'AI & RAG testing', 'Playwright', 'Python', 'SQL', 'Postman',
-  'Payment testing', 'Product thinking', 'Release confidence'
-];
-
+/* ─────────────────────────────────────────────────────────────────
+   PROJECTS WITH FULL MODAL DETAIL
+───────────────────────────────────────────────────────────────── */
 const projects = [
   {
+    id: 'ai-platform',
     icon: BrainCircuit,
-    eyebrow: 'AI QUALITY',
-    title: 'Testing an AI-powered operations platform',
-    summary: 'Designed end-to-end validation across chat, RAG, agents, connectors, structured data, knowledge graphs, and user-facing workflows.',
-    details: [
-      'Mapped complete system flows before automating them',
-      'Validated AI outputs for correctness, context use, explainability, and failure handling',
-      'Tested across UI, APIs, databases, logs, queues, and downstream data stores'
-    ],
-    tags: ['AI testing', 'RAG', 'Agents', 'System testing']
+    eyebrow: 'AI QUALITY · FERMI DEVELOPMENT',
+    title: 'End-to-End Testing of an AI-Powered Operations Platform',
+    summary: 'Owned quality across a full-stack AI platform — chat workflows, RAG retrieval, MCP agent integrations, ETL pipelines, connector ingestion, and analytics — from test design to release validation.',
+    tags: ['RAG Validation', 'MCP Agents', 'LLM Eval', 'ETL', 'Postman', 'Python'],
+    accentColor: '#3a8a56',
+    modal: {
+      context: 'Fermi Development is a B2B SaaS company building an AI-powered enterprise operations platform. It connects business data from documents, databases, applications, and external connectors — processing it through ingestion and transformation pipelines, then making it available to AI agents, search, analytics, and conversational workflows. Every layer is interconnected: a field-mapping error during ingestion can appear as an inaccurate AI response rather than an obvious pipeline error.',
+      whatIDid: 'I owned QA across every layer of this platform — UI flows, API collections, database state, pipeline monitoring, and AI response quality — and was the primary person responsible for catching what automated checks missed.',
+      responsibilities: [
+        'Designed API test collections covering authentication, CRUD operations, integration flows, error handling, and API-to-database state consistency',
+        'Validated RAG pipeline accuracy: retrieval relevance, context injection, hallucination risk, and grounding against source documents',
+        'Tested MCP agent tool calls, fallback behaviors, timeout handling, and edge-case agent loops',
+        'Conducted ETL QA: field mapping, schema accuracy, metadata validation, deduplication, sync state tracking, and error recovery',
+        'Cross-validated data consistency across MongoDB, Neo4j, OpenSearch, and Elasticsearch after every pipeline run',
+        'Built an AI-based QA agent with MCP integrations to automate PR review test case generation',
+        'Supported releases through ArgoCD log analysis, AWS EC2/S3 environment checks, and Python automation scripts',
+        'Communicated quality risk, test coverage gaps, and release readiness clearly to engineering and product teams',
+      ],
+      challenges: [
+        'AI outputs are non-deterministic — identical inputs produced varying responses, making traditional assertion-based testing insufficient',
+        'Failures in distributed services were hard to isolate without deep cross-system log analysis',
+        'Pipeline latency and eventual consistency made synchronous validation unreliable',
+        'Testing agent behavior required understanding tool-call chains, not just final outputs',
+      ],
+      approach: 'I mapped every system flow end-to-end before writing a single test. Built a layer-by-layer validation strategy — UI, API, DB, pipeline, AI output — with clear traceability between test scenarios and system risks. For AI components, I defined behavioral contracts instead of exact assertions: expected retrieval sources, acceptable response patterns, hallucination guardrails.',
+      tools: ['Postman', 'Python', 'Playwright', 'MongoDB', 'Neo4j', 'OpenSearch', 'Elasticsearch', 'ArgoCD', 'AWS EC2 / S3', 'Airbyte', 'JIRA'],
+      achievements: [
+        'Reduced manual PR review QA effort by 50% through AI-based QA agent automation',
+        'Identified 3 critical data loss bugs in ingestion pipelines before production deployment',
+        'Established RAG benchmarking and LLM evaluation workflows adopted by the engineering team',
+        'Built the first structured AI testing framework for a team that had none',
+      ],
+      impact: 'Prevented silent AI quality degradation from reaching end users. Gave the engineering team systematic confidence that AI responses were grounded, accurate, and failure-safe — something that previously had no formal process.',
+      learnings: 'Testing AI systems requires a mindset shift — from "is the output correct?" to "is the system behaving within defined contracts?" Understanding retrieval behavior, context window limits, and hallucination triggers is now part of how I approach any AI component.',
+    },
   },
   {
+    id: 'etl-data',
     icon: Database,
-    eyebrow: 'DATA QUALITY',
-    title: 'Validating ingestion and ETL pipelines',
-    summary: 'Tested data movement from source connectors through parsing, processing, storage, analytics, and AI consumption.',
-    details: [
-      'Checked schema, transformations, duplicates, missing data, retries, and sync states',
-      'Compared source data with Athena, OpenSearch, MongoDB, and Neo4j outputs',
-      'Built scenario coverage for structured and unstructured files'
-    ],
-    tags: ['ETL', 'Athena', 'OpenSearch', 'Neo4j']
+    eyebrow: 'DATA QUALITY · FERMI DEVELOPMENT',
+    title: 'ETL Pipeline and Multi-System Data Validation',
+    summary: 'Designed and executed full pipeline QA from multi-source ingestion through transformation, storage, search indexing, and downstream AI consumption — catching failures invisible to feature tests.',
+    tags: ['ETL', 'Airbyte', 'OpenSearch', 'Neo4j', 'Elasticsearch', 'SQL'],
+    accentColor: '#c9a96e',
+    modal: {
+      context: 'The platform ingested data from multiple sources — file uploads, API connectors via Airbyte, and database feeds — processing it through transformation layers before storing to MongoDB, building graph relationships in Neo4j, and indexing for search in OpenSearch and Elasticsearch. This data ultimately fed the AI system. Silent data corruption here meant corrupted AI responses.',
+      whatIDid: 'Designed and executed systematic source-to-target pipeline validation at every checkpoint — not just at the final output — to catch transformation errors, data loss, and consistency failures before they reached downstream AI consumption.',
+      responsibilities: [
+        'Schema validation at ingestion: field types, nullability, required fields, unexpected values',
+        'Transformation accuracy: business logic applied during ETL, field renaming, computed fields',
+        'Source-to-target data comparison: MongoDB counts vs source records, Neo4j relationship accuracy, OpenSearch index completeness',
+        'Cron job behavior: trigger accuracy, retry logic, failure recovery, idempotency on re-runs',
+        'Search relevance validation: indexed fields, boost weights, tokenization accuracy in OpenSearch/Elasticsearch',
+        'Data staleness detection: identifying records that were not refreshed on schedule',
+        'Edge case scenarios: malformed inputs, partial failures, oversized documents, special characters',
+      ],
+      challenges: [
+        'Async ingestion pipelines had no deterministic completion signal — validating too early gave false failures',
+        'Schema drift from upstream sources silently corrupted downstream data without raising errors',
+        'Graph relationships in Neo4j required custom Cypher-based validation logic that had to be built from scratch',
+        'Eventual consistency across systems meant validating state at the right moment was critical',
+      ],
+      approach: 'Built a systematic checkpoint-based validation approach: validate at source, after transformation, after storage, after indexing, and after AI consumption. Treated each checkpoint as an independent quality gate. Created test scenarios for both happy paths and failure modes — partial failures, timeouts, malformed inputs, and concurrent writes.',
+      tools: ['Airbyte', 'MongoDB', 'Neo4j', 'OpenSearch', 'Elasticsearch', 'AWS Athena', 'SQL', 'Python', 'JIRA'],
+      achievements: [
+        'Caught 3 critical silent data loss scenarios invisible to feature tests before production',
+        'Documented field-level validation patterns adopted by the team for future pipelines',
+        'Identified a Neo4j relationship duplication bug causing incorrect AI knowledge graph responses',
+        'Reduced data-related production incidents by establishing pipeline quality checkpoints',
+      ],
+      impact: 'Data quality failures are invisible until they degrade user experience in hard-to-diagnose ways. This work prevented bad data from silently corrupting AI responses — a class of bugs that would have been blamed on the AI model rather than the data pipeline.',
+      learnings: 'Data validation is not about schema alone. Understanding the business meaning of each field — and what "wrong" data looks like downstream — separates surface-level testing from real data quality assurance. I now always ask: if this field is wrong, who notices first, and how much damage has already been done?',
+    },
   },
   {
-    icon: Code2,
-    eyebrow: 'QA AUTOMATION',
-    title: 'Building practical automation from real product risks',
-    summary: 'Created a scalable automation direction using Python, Playwright, APIs, reusable flows, and product-aware regression coverage.',
-    details: [
-      'Focused automation on high-risk journeys instead of raw test count',
-      'Used page objects, reusable fixtures, data-driven tests, and API helpers',
-      'Connected automation thinking with observability and defect diagnosis'
-    ],
-    tags: ['Python', 'Playwright', 'API automation', 'Framework design']
-  },
-  {
+    id: 'payments',
     icon: ShieldCheck,
-    eyebrow: 'PAYMENTS',
-    title: 'Protecting subscription and payment journeys',
-    summary: 'Validated payment gateways, subscription changes, renewals, webhooks, failures, retries, and cross-platform consistency.',
-    details: [
-      'Covered Stripe and Nexio payment scenarios',
-      'Verified backend events and state changes beyond the UI',
-      'Tested web, Android, and iOS customer journeys'
-    ],
-    tags: ['Stripe', 'Nexio', 'Webhooks', 'Mobile testing']
-  }
+    eyebrow: 'PAYMENTS · BRIDGING TECHNOLOGIES',
+    title: 'Payment Gateway and Subscription Lifecycle Testing',
+    summary: 'Validated end-to-end payment flows across Stripe subscriptions, Nexio transactions, and webhook-driven billing events — across web, Android, and iOS — with zero payment bugs reaching production.',
+    tags: ['Stripe', 'Nexio', 'Webhooks', 'REST API', 'Mobile', 'MySQL'],
+    accentColor: '#c27455',
+    modal: {
+      context: 'The SaaS platform managed user subscriptions through Stripe, handled one-time payments through Nexio, and relied on webhooks to drive billing state changes in real time. Payment bugs directly translated to revenue loss, user trust damage, and support escalations. The platform served web, Android, and iOS simultaneously — each with its own checkout implementation.',
+      whatIDid: 'Validated the complete payment lifecycle — from plan selection through checkout, subscription changes, renewals, failures, retries, and webhook processing. Treated each payment flow as a multi-layer system test, not a UI click sequence.',
+      responsibilities: [
+        'Stripe subscription testing: plan creation, upgrade, downgrade, pause, cancel, and renewal edge cases',
+        'Nexio one-time payment flows: success, decline, timeout, and refund scenarios',
+        'Webhook validation: event delivery, payload structure, retry behavior, idempotency',
+        'Backend billing state verification: comparing database records against UI-visible states via REST API and MySQL',
+        'Cross-platform consistency: web, Android, and iOS checkout flows independently validated',
+        'Subscription state edge cases: simultaneous changes, mid-cycle upgrades, trial-to-paid transitions',
+        'Defect lifecycle management in JIRA with clear severity classification and reproduction steps',
+      ],
+      challenges: [
+        'Stripe sandbox and production environments behaved differently for specific card types and 3DS flows',
+        'Webhook retry sequences were time-dependent — some bugs only appeared with delayed webhook delivery',
+        'Mobile platforms (Android and iOS) each had independent checkout UI requiring separate validation strategies',
+        'Billing state in the database sometimes diverged from UI display with no immediate error signal',
+      ],
+      approach: 'Treated payment testing as a full-stack exercise — not just clicking "pay." For every scenario: validated the UI response, the API call and response, the webhook event payload, and the database billing record simultaneously. Built a payment scenario matrix covering all plan types, user states, and failure modes.',
+      tools: ['Postman', 'Stripe', 'Nexio', 'REST API', 'MySQL', 'phpMyAdmin', 'JIRA', 'Android', 'iOS'],
+      achievements: [
+        'Strengthened regression coverage for subscription and payment workflows',
+        'Improved defect reporting by including API, webhook, and database evidence',
+        'Established a comprehensive payment test scenario matrix adopted by the team',
+        'Discovered a webhook retry bug causing double-billing on timeout that had gone undetected',
+        'Reduced payment-related support tickets by improving pre-release coverage',
+      ],
+      impact: 'Reliable payment testing meant the engineering team could deploy billing changes confidently. Structured coverage across webhooks, APIs, and database state made payment-related issues easier to catch, reproduce, and communicate clearly.',
+      learnings: 'Webhooks are the source of truth — not the UI. Testing payment systems without verifying webhook events is dangerously incomplete. Understanding the full event lifecycle — and what the database should look like at each stage — changed how I approach every integration test.',
+    },
+  },
+  {
+    id: 'social-ai',
+    icon: Layers3,
+    eyebrow: 'AI PLATFORM QA · BRIDGING TECHNOLOGIES',
+    title: 'Testing an AI-Based Social Media Automation Platform',
+    summary: 'Validated AI content generation, scheduling logic, NLP outputs, cross-platform API compliance, and AWS infrastructure across LinkedIn, Instagram, and Twitter.',
+    tags: ['AI Content QA', 'NLP Testing', 'REST API', 'AWS EC2', 'MySQL'],
+    accentColor: '#8b6f5e',
+    modal: {
+      context: 'Bridging Technologies built an AI-powered social media automation platform that generated content, scheduled posts, and managed engagement workflows across LinkedIn, Instagram, and Twitter. The AI layer produced content based on user inputs and platform-specific engagement rules — making output quality, correctness, and compliance central testing concerns.',
+      whatIDid: 'Owned end-to-end QA across the AI content layer, API integrations, scheduling engine, backend database, and AWS infrastructure — ensuring the platform behaved correctly and safely across all three social platforms.',
+      responsibilities: [
+        'Validated AI-generated content for relevance, tone, platform compliance, and accuracy against user-defined goals',
+        'Tested scheduling logic: post timing accuracy, queue management, retry behavior, and failure handling',
+        'Verified NLP output quality — checking language coherence, hashtag accuracy, and engagement signal alignment',
+        'Executed REST API testing for all social platform integrations and validated API rate limit handling',
+        'Backend DB verification using phpMyAdmin: cross-checking scheduled posts, statuses, and user settings against live records',
+        'Monitored real-time error logs on AWS EC2 instances and validated S3 media storage workflows',
+        'Tracked and prioritised defects in JIRA with full reproduction steps and severity context',
+      ],
+      challenges: [
+        'AI-generated content was non-deterministic — validating "quality" required defining clear behavioral contracts rather than exact output matching',
+        'Each social platform had different API constraints, rate limits, and content rules requiring separate validation strategies',
+        'Scheduling failures were time-dependent and hard to reproduce consistently',
+        'AWS log monitoring required understanding infrastructure context beyond QA basics',
+      ],
+      approach: 'Defined platform-specific content quality contracts for each social channel. Built scenario matrices covering content types, scheduling states, API edge cases, and failure modes. For AI outputs, focused on behavioral correctness — does the content match the stated goal, tone, and platform format — rather than literal string matching.',
+      tools: ['Postman', 'REST API', 'MySQL', 'phpMyAdmin', 'AWS EC2', 'AWS S3', 'JIRA'],
+      achievements: [
+        'Caught multiple NLP output quality issues before they reached live social accounts',
+        'Identified an API rate limit bug causing silent scheduling failures during peak usage',
+        'Established platform-specific test checklists for LinkedIn, Instagram, and Twitter compliance',
+      ],
+      impact: 'Prevented incorrect or non-compliant AI content from being published to real user social accounts — protecting both user reputation and platform terms compliance.',
+      learnings: 'Testing AI-generated content requires defining "what good looks like" before writing a single test. Without clear quality contracts, every output looks subjectively acceptable. This shaped how I approach AI testing at Fermi — contracts first, assertions second.',
+    },
+  },
+  {
+    id: 'fitness-app',
+    icon: TestTube2,
+    eyebrow: 'CROSS-PLATFORM QA · TIARA IT SERVICES',
+    title: 'Cross-Platform Testing of a Fitness and Booking Application',
+    summary: 'Designed structured test cases in TestRail, executed regression and E2E testing across web, Android, and iOS, and validated Nexio payment flows — building the foundation of a systematic QA practice.',
+    tags: ['Manual Testing', 'TestRail', 'Nexio', 'Android', 'iOS', 'Regression'],
+    accentColor: '#c9a96e',
+    modal: {
+      context: 'Tiara IT Services built a cross-platform fitness and booking application serving users across web browsers, Android phones, and iOS devices. The app handled class bookings, subscription management, trainer scheduling, and payment processing through Nexio. Functional consistency across all platforms was a core requirement.',
+      whatIDid: 'Designed and executed structured QA across all three platforms — writing test cases, running regression cycles, validating payment flows, and managing the defect lifecycle from discovery to verified fix.',
+      responsibilities: [
+        'Designed structured test cases in TestRail covering functional, regression, UI consistency, and end-to-end booking scenarios',
+        'Executed full regression cycles before every release across web, Android, and iOS',
+        'Validated Nexio payment flows: one-time transactions, success/failure states, edge cases, and backend billing accuracy',
+        'Performed exploratory testing to uncover defects outside defined test cases',
+        'Managed defect lifecycle in JIRA — logging, prioritising, collaborating with developers, and verifying fixes',
+        'Contributed to Agile sprint reviews, planning sessions, and retrospectives with QA insights',
+        'Automated select test flows using RainforestQA and Katalon to reduce manual regression effort',
+      ],
+      challenges: [
+        'Cross-platform UI consistency was difficult to maintain — small OS and device variations caused visual and functional divergence',
+        'Manual testing at scale across three platforms required disciplined test case management to avoid coverage gaps',
+        'Nexio payment sandbox limitations made some edge cases harder to replicate consistently',
+      ],
+      approach: 'Maintained a structured TestRail suite organised by feature and platform. Ran platform-specific regression before each release cycle, with a shared core for cross-platform scenarios. Used exploratory sessions to go beyond the defined test cases after each new feature drop.',
+      tools: ['TestRail', 'JIRA', 'Nexio', 'RainforestQA', 'Katalon', 'Android', 'iOS'],
+      achievements: [
+        'Built the first structured TestRail test suite for the product from scratch',
+        'Reduced manual regression effort through RainforestQA and Katalon automation',
+        'Identified a Nexio payment state mismatch bug causing incorrect billing confirmation',
+        'Maintained consistent release quality across three platforms throughout tenure',
+      ],
+      impact: 'Gave the team a reliable, repeatable QA process where none existed before. Structured test cases and disciplined regression cycles meant releases became predictable rather than anxious.',
+      learnings: 'This role taught me that good testing starts with good structure. Clear test cases, organised coverage, and consistent execution discipline are the foundation everything else is built on. Without them, automation and tooling solve the wrong problems.',
+    },
+  },
 ];
 
+/* ─────────────────────────────────────────────────────────────────
+   SKILLS
+───────────────────────────────────────────────────────────────── */
+const skillCats = ['All', 'Automation', 'API & Integration', 'Databases', 'Data, Search & ETL', 'Cloud & DevOps', 'Test Management', 'Performance & Mobile', 'Payments'];
+
+const aiQualityDisciplines = [
+  { n: 'RAG Evaluation',        desc: 'Relevance, grounding and retrieval accuracy of RAG pipelines' },
+  { n: 'Prompt Testing',        desc: 'Intent alignment, output consistency and edge-case inputs' },
+  { n: 'Grounding Validation',  desc: 'Confirming answers are supported by source context' },
+  { n: 'Hallucination Testing', desc: 'Detecting unsupported or fabricated content in AI responses' },
+  { n: 'MCP Agent Testing',     desc: 'Tool selection, fallback behaviour and agent loop failures' },
+  { n: 'Guardrail Testing',     desc: 'Validating safety constraints and refusal behaviour' },
+];
+
+const skillData = [
+  { name: 'Playwright (Python)', cat: 'Automation',           tag: 'Primary' },
+  { name: 'Python',              cat: 'Automation',           tag: 'Primary' },
+  { name: 'PyTest',              cat: 'Automation'                           },
+  { name: 'Selenium',            cat: 'Automation'                           },
+  { name: 'RainforestQA',        cat: 'Automation'                           },
+  { name: 'Katalon',             cat: 'Automation'                           },
+
+  { name: 'Postman',             cat: 'API & Integration',    tag: 'Primary' },
+  { name: 'REST APIs',           cat: 'API & Integration',    tag: 'Primary' },
+  { name: 'Webhooks',            cat: 'API & Integration'                    },
+  { name: 'OpenAI API',          cat: 'API & Integration'                    },
+
+  { name: 'MySQL',               cat: 'Databases',            tag: 'Primary' },
+  { name: 'PostgreSQL',          cat: 'Databases'                            },
+  { name: 'MongoDB',             cat: 'Databases',            tag: 'Primary' },
+  { name: 'Neo4j',               cat: 'Databases',            tag: 'Primary' },
+  { name: 'phpMyAdmin',          cat: 'Databases'                            },
+
+  { name: 'Airbyte',             cat: 'Data, Search & ETL',   tag: 'Primary' },
+  { name: 'OpenSearch',          cat: 'Data, Search & ETL',   tag: 'Primary' },
+  { name: 'Elasticsearch',       cat: 'Data, Search & ETL'                   },
+  { name: 'AWS Athena',          cat: 'Data, Search & ETL'                   },
+  { name: 'SQL',                 cat: 'Data, Search & ETL',   tag: 'Primary' },
+
+
+  { name: 'AWS EC2 / S3',        cat: 'Cloud & DevOps'                       },
+  { name: 'ArgoCD',              cat: 'Cloud & DevOps'                       },
+  { name: 'Docker',              cat: 'Cloud & DevOps'                       },
+  { name: 'Git',                 cat: 'Cloud & DevOps'                       },
+  { name: 'Linux',               cat: 'Cloud & DevOps'                       },
+
+  { name: 'JIRA',                cat: 'Test Management',      tag: 'Primary' },
+  { name: 'TestRail',            cat: 'Test Management'                      },
+
+  { name: 'JMeter',              cat: 'Performance & Mobile'                 },
+  { name: 'TestFlight',          cat: 'Performance & Mobile'                 },
+  { name: 'Android',             cat: 'Performance & Mobile'                 },
+  { name: 'iOS',                 cat: 'Performance & Mobile'                 },
+
+  { name: 'Stripe',              cat: 'Payments'                             },
+  { name: 'Nexio',               cat: 'Payments'                             },
+];
+
+/* ─────────────────────────────────────────────────────────────────
+   TOOLS GRID (visual, emoji-based, grouped)
+───────────────────────────────────────────────────────────────── */
+/* Renders either a simple-icons SVG or a lucide/custom React component */
+function BrandIcon({ icon, size = 17, color }) {
+  if (icon && icon.path) {
+    const fill = color || `#${icon.hex}`;
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} aria-hidden="true">
+        <path d={icon.path} />
+      </svg>
+    );
+  }
+  const Icon = icon;
+  return <Icon size={size} color={color || 'currentColor'} />;
+}
+
+/* ── Custom brand shapes for tools not in simple-icons ── */
+const PlaywrightIcon = ({ size = 17 }) => (
+  <svg width={size} height={size} viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M136.444 221.556C123.558 225.213 115.104 231.625 109.535 238.032C114.869 233.364 122.014 229.08 131.652 226.348C141.51 223.554 149.92 223.574 156.869 224.915V219.481C150.941 218.939 144.145 219.371 136.444 221.556ZM108.946 175.876L61.0895 188.484C61.0895 188.484 61.9617 189.716 63.5767 191.36L104.153 180.668C104.153 180.668 103.578 188.077 98.5847 194.705C108.03 187.559 108.946 175.876 108.946 175.876ZM149.005 288.347C81.6582 306.486 46.0272 228.438 35.2396 187.928C30.2556 169.229 28.0799 155.067 27.5 145.928C27.4377 144.979 27.4665 144.179 27.5336 143.446C24.04 143.657 22.3674 145.473 22.7077 150.721C23.2876 159.855 25.4633 174.016 30.4473 192.721C41.2301 233.225 76.8659 311.273 144.213 293.134C158.872 289.185 169.885 281.992 178.152 272.81C170.532 279.692 160.995 285.112 149.005 288.347ZM161.661 128.11V132.903H188.077C187.535 131.206 186.989 129.677 186.447 128.11H161.661Z" fill="#2D4552"/>
+    <path d="M193.981 167.584C205.861 170.958 212.144 179.287 215.465 186.658L228.711 190.42C228.711 190.42 226.904 164.623 203.57 157.995C181.741 151.793 168.308 170.124 166.674 172.496C173.024 167.972 182.297 164.268 193.981 167.584ZM299.422 186.777C277.573 180.547 264.145 198.916 262.535 201.255C268.89 196.736 278.158 193.031 289.837 196.362C301.698 199.741 307.976 208.06 311.307 215.436L324.572 219.212C324.572 219.212 322.736 193.41 299.422 186.777ZM286.262 254.795L176.072 223.99C176.072 223.99 177.265 230.038 181.842 237.869L274.617 263.805C282.255 259.386 286.262 254.795 286.262 254.795ZM209.867 321.102C122.618 297.71 133.166 186.543 147.284 133.865C153.097 112.156 159.073 96.0203 164.029 85.204C161.072 84.5953 158.623 86.1529 156.203 91.0746C150.941 101.747 144.212 119.124 137.7 143.45C123.586 196.127 113.038 307.29 200.283 330.682C241.406 341.699 273.442 324.955 297.323 298.659C274.655 319.19 245.714 330.701 209.867 321.102Z" fill="#2D4552"/>
+    <path d="M161.661 262.296V239.863L99.3324 257.537C99.3324 257.537 103.938 230.777 136.444 221.556C146.302 218.762 154.713 218.781 161.661 220.123V128.11H192.869C189.471 117.61 186.184 109.526 183.423 103.909C178.856 94.612 174.174 100.775 163.545 109.665C156.059 115.919 137.139 129.261 108.668 136.933C80.1966 144.61 57.179 142.574 47.5752 140.911C33.9601 138.562 26.8387 135.572 27.5049 145.928C28.0847 155.062 30.2605 169.224 35.2445 187.928C46.0272 228.433 81.663 306.481 149.01 288.342C166.602 283.602 179.019 274.233 187.626 262.291H161.661V262.296ZM61.0848 188.484L108.946 175.876C108.946 175.876 107.551 194.288 89.6087 199.018C71.6614 203.743 61.0848 188.484 61.0848 188.484Z" fill="#E2574C"/>
+    <path d="M341.786 129.174C329.345 131.355 299.498 134.072 262.612 124.185C225.716 114.304 201.236 97.0224 191.537 88.8994C177.788 77.3834 171.74 69.3802 165.788 81.4857C160.526 92.163 153.797 109.54 147.284 133.866C133.171 186.543 122.623 297.706 209.867 321.098C297.093 344.47 343.53 242.92 357.644 190.238C364.157 165.917 367.013 147.5 367.799 135.625C368.695 122.173 359.455 126.078 341.786 129.174ZM166.497 172.756C166.497 172.756 180.246 151.372 203.565 158C226.899 164.628 228.706 190.425 228.706 190.425L166.497 172.756ZM223.42 268.713C182.403 256.698 176.077 223.99 176.077 223.99L286.262 254.796C286.262 254.791 264.021 280.578 223.42 268.713ZM262.377 201.495C262.377 201.495 276.107 180.126 299.422 186.773C322.736 193.411 324.572 219.208 324.572 219.208L262.377 201.495Z" fill="#2EAD33"/>
+    <path d="M139.88 246.04L99.3324 257.532C99.3324 257.532 103.737 232.44 133.607 222.496L110.647 136.33L108.663 136.933C80.1918 144.611 57.1742 142.574 47.5704 140.911C33.9554 138.563 26.834 135.572 27.5001 145.929C28.08 155.063 30.2557 169.224 35.2397 187.929C46.0225 228.433 81.6583 306.481 149.005 288.342L150.989 287.719L139.88 246.04ZM61.0848 188.485L108.946 175.876C108.946 175.876 107.551 194.288 89.6087 199.018C71.6615 203.743 61.0848 188.485 61.0848 188.485Z" fill="#D65348"/>
+    <path d="M225.27 269.163L223.415 268.712C182.398 256.698 176.072 223.99 176.072 223.99L232.89 239.872L262.971 124.281L262.607 124.185C225.711 114.304 201.232 97.0224 191.532 88.8994C177.783 77.3834 171.735 69.3802 165.783 81.4857C160.526 92.163 153.797 109.54 147.284 133.866C133.171 186.543 122.623 297.706 209.867 321.097L211.655 321.5L225.27 269.163ZM166.497 172.756C166.497 172.756 180.246 151.372 203.565 158C226.899 164.628 228.706 190.425 228.706 190.425L166.497 172.756Z" fill="#1D8D22"/>
+    <path d="M141.946 245.451L131.072 248.537C133.641 263.019 138.169 276.917 145.276 289.195C146.513 288.922 147.74 288.687 149 288.342C152.302 287.451 155.364 286.348 158.312 285.145C150.371 273.361 145.118 259.789 141.946 245.451ZM137.7 143.451C132.112 164.307 127.113 194.326 128.489 224.436C130.952 223.367 133.554 222.371 136.444 221.551L138.457 221.101C136.003 188.939 141.308 156.165 147.284 133.866C148.799 128.225 150.318 122.978 151.832 118.085C149.393 119.637 146.767 121.228 143.776 122.867C141.759 129.093 139.722 135.898 137.7 143.451Z" fill="#C04B41"/>
+  </svg>
+);
+
+const KatalonIcon = ({ size = 17, color = '#009B72' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M6 4v16" />
+    <path d="M6 12L17 4" />
+    <path d="M6 12l11 8" />
+  </svg>
+);
+
+const OpenAIIcon = ({ size = 17, color = '#412991' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true">
+    <path d="M22.28 9.82a5.98 5.98 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.51 2.9A5.98 5.98 0 0 0 13.26 24a6.06 6.06 0 0 0 5.77-4.21 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.75-7.07zM13.26 22.43a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.8.8 0 0 0 .39-.68V11.2l2.02 1.17a.07.07 0 0 1 .04.05v5.58a4.5 4.5 0 0 1-4.49 4.43zM3.6 18.3a4.47 4.47 0 0 1-.54-3.01l.14.08 4.78 2.76a.77.77 0 0 0 .78 0l5.84-3.37v2.33a.08.08 0 0 1-.03.06L9.74 19.95A4.5 4.5 0 0 1 3.6 18.3zM2.34 7.9a4.49 4.49 0 0 1 2.37-1.97v5.67a.77.77 0 0 0 .39.68l5.81 3.36-2.02 1.17a.08.08 0 0 1-.07 0L4.1 13.95A4.5 4.5 0 0 1 2.34 7.9zm16.6 3.86-5.84-3.37 2.02-1.17a.08.08 0 0 1 .07 0l4.83 2.79a4.49 4.49 0 0 1-.68 8.1v-5.67a.79.79 0 0 0-.4-.68zm2.01-3.02-.14-.09-4.77-2.78a.78.78 0 0 0-.79 0L9.41 9.23V6.9a.07.07 0 0 1 .03-.06l4.83-2.79a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.13-2.02-1.16a.08.08 0 0 1-.04-.06V6.07a4.5 4.5 0 0 1 7.38-3.45l-.14.08-4.78 2.76a.8.8 0 0 0-.39.68v6.74zm1.1-2.37 2.6-1.5 2.61 1.5v3l-2.6 1.5-2.61-1.5V10.5z" />
+  </svg>
+);
+
+const AWSAthenaIcon = ({ size = 17, color = '#8C4FFF' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <ellipse cx="12" cy="6" rx="8" ry="2.8" fill={color} opacity=".85" />
+    <path d="M4 6v4.5c0 1.55 3.58 2.8 8 2.8" stroke={color} strokeWidth="1.5" fill="none" />
+    <path d="M20 6v4.5" stroke={color} strokeWidth="1.5" />
+    <circle cx="17" cy="18" r="4" stroke={color} strokeWidth="1.5" fill="none" />
+    <path d="M14.5 15.5l5 5" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+
+const TestFlightIcon = ({ size = 17, color = '#1D6FF2' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true">
+    <circle cx="12" cy="12" r="2" />
+    <path d="M12 2c-1.1 0-2 .9-2 2s.9 2 2 2V2z" />
+    <path d="M22 12c0-1.1-.9-2-2-2s-2 .9-2 2h4z" />
+    <path d="M12 22c1.1 0 2-.9 2-2s-.9-2-2-2v4z" />
+    <path d="M2 12c0 1.1.9 2 2 2s2-.9 2-2H2z" />
+    <path d="M5.64 5.64c-.78.78-.78 2.05 0 2.83s2.05.78 2.83 0L5.64 5.64z" />
+    <path d="M18.36 5.64c-.78-.78-2.05-.78-2.83 0s-.78 2.05 0 2.83l2.83-2.83z" />
+    <path d="M18.36 18.36c.78-.78.78-2.05 0-2.83s-2.05-.78-2.83 0l2.83 2.83z" />
+    <path d="M5.64 18.36c.78.78 2.05.78 2.83 0s.78-2.05 0-2.83L5.64 18.36z" />
+  </svg>
+);
+
+const NexioIcon = ({ size = 17, color = '#1A56DB' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M5 4v16L19 4v16" />
+  </svg>
+);
+
+const RainforestIcon = ({ size = 17, color = '#16A34A' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true">
+    <path d="M12 2L6 10h3.5L7 14h5v8h2v-8h5l-2.5-4H20z" />
+  </svg>
+);
+
+const toolGroups = [
+  { label: 'Automation',             color: '#c27455', tools: [
+    { icon: PlaywrightIcon, n: 'Playwright'  },
+    { icon: siPython,       n: 'Python'      },
+    { icon: siPytest,       n: 'PyTest'      },
+    { icon: siSelenium,     n: 'Selenium'    },
+    { icon: RainforestIcon, n: 'RainforestQA'},
+    { icon: KatalonIcon,    n: 'Katalon'     },
+  ]},
+  { label: 'API & Integration',      color: '#a85a3a', tools: [
+    { icon: siPostman,      n: 'Postman'                  },
+    { icon: Globe,          n: 'REST APIs',  c: '#6B7280' },
+    { icon: Webhook,        n: 'Webhooks',   c: '#6B7280' },
+    { icon: OpenAIIcon,     n: 'OpenAI API'               },
+  ]},
+  { label: 'Databases',              color: '#8b6f5e', tools: [
+    { icon: siMysql,        n: 'MySQL'       },
+    { icon: siPostgresql,   n: 'PostgreSQL'  },
+    { icon: siMongodb,      n: 'MongoDB'     },
+    { icon: siNeo4j,        n: 'Neo4j'       },
+    { icon: siPhpmyadmin,   n: 'phpMyAdmin'  },
+  ]},
+  { label: 'Data, Search & ETL',     color: '#4a6abf', tools: [
+    { icon: siAirbyte,        n: 'Airbyte'                  },
+    { icon: siOpensearch,     n: 'OpenSearch'                },
+    { icon: siElasticsearch,  n: 'Elasticsearch'             },
+    { icon: AWSAthenaIcon,    n: 'AWS Athena'                },
+    { icon: Table,            n: 'SQL',          c: '#6B7280'},
+  ]},
+  { label: 'Cloud & DevOps',         color: '#555555', tools: [
+    { icon: Cloud,          n: 'AWS',        c: '#FF9900' },
+    { icon: siArgo,         n: 'ArgoCD'                  },
+    { icon: siDocker,       n: 'Docker'                  },
+    { icon: siGit,          n: 'Git'                     },
+    { icon: siLinux,        n: 'Linux'                   },
+  ]},
+  { label: 'Test & Defect Management', color: '#c9a96e', tools: [
+    { icon: siJira,         n: 'JIRA'        },
+    { icon: siTestrail,     n: 'TestRail'    },
+  ]},
+  { label: 'Performance & Mobile',   color: '#6b7c93', tools: [
+    { icon: siApachejmeter, n: 'JMeter'      },
+    { icon: TestFlightIcon, n: 'TestFlight'  },
+    { icon: siAndroid,      n: 'Android'     },
+    { icon: siIos,          n: 'iOS'         },
+  ]},
+  { label: 'Payments',               color: '#7c5cbf', tools: [
+    { icon: siStripe,       n: 'Stripe'      },
+    { icon: NexioIcon,      n: 'Nexio'       },
+  ]},
+];
+
+/* ─────────────────────────────────────────────────────────────────
+   CAPABILITIES (abstract skill areas)
+───────────────────────────────────────────────────────────────── */
+const capabilities = [
+  { icon: Code2,          label: 'Test Automation',      desc: 'Playwright, PyTest, Python — scalable, fixture-driven, product-aware frameworks.' },
+  { icon: Layers3,        label: 'API Testing',          desc: 'Request/response, auth flows, integrations, and API-to-database consistency.' },
+  { icon: Database,       label: 'Database Testing',     desc: 'SQL, MongoDB, Neo4j — validating schema, state, and cross-system consistency.' },
+  { icon: GitBranch,      label: 'Data & ETL Validation',desc: 'Pipeline-level testing: ingestion accuracy, transformation correctness, sync integrity.' },
+  { icon: BrainCircuit,   label: 'AI / LLM Testing',     desc: 'RAG validation, prompt benchmarking, MCP agent behavior, hallucination detection.' },
+  { icon: SearchCheck,    label: 'Test Strategy',        desc: 'Risk-based coverage design, flow mapping, and gap analysis before writing tests.' },
+  { icon: MessageSquareText,label:'Release Ownership',   desc: 'Communicating quality risk, release readiness, and defect priority to teams.' },
+  { icon: Zap,            label: 'Cross-Platform QA',    desc: 'Web, Android, iOS — consistent validation across environments and form factors.' },
+];
+
+/* ─────────────────────────────────────────────────────────────────
+   EXPERIENCE
+───────────────────────────────────────────────────────────────── */
 const experience = [
   {
-    company: 'Fermi Development Private Limited',
-    role: 'SDET / QA Engineer',
+    company: 'Fermi Development Pvt Ltd',
+    current: true,
+    location: 'Gurgaon',
+    role: 'SDET',
     period: 'Feb 2026 — Present',
-    copy: 'Owning quality across an AI-powered operations platform involving connectors, data pipelines, chat, knowledge systems, analytics, workflows, and agent-based experiences.',
-    highlights: ['AI and RAG validation', 'ETL and connector testing', 'Backend and database validation', 'Release risk communication']
+    product: 'AI-powered enterprise operations platform',
+    intro: 'Owning end-to-end quality across a multi-layered AI platform — conversational UI, RAG knowledge retrieval, MCP-integrated agents, ETL pipelines, connector ingestion, analytics, and release validation.',
+    highlights: [
+      { title: 'AI & RAG Testing', detail: 'Validated LLM prompt quality, RAG retrieval accuracy, context grounding, and agent tool-call behavior for non-deterministic AI components.' },
+      { title: 'ETL & Data Pipelines', detail: 'Field-level validation across ingestion, transformation, and sync — catching silent data corruption before it reached AI consumption.' },
+      { title: 'Cross-service Validation', detail: 'Source-to-target consistency checks across MongoDB, Neo4j, OpenSearch, and Elasticsearch after every pipeline run.' },
+      { title: 'API Depth', detail: 'Comprehensive Postman collections covering auth, CRUD, integrations, error handling, and API-to-DB consistency.' },
+      { title: 'Release Support', detail: 'ArgoCD log analysis, AWS EC2/S3 environment checks, and Python scripts to support CI/CD release confidence.' },
+      { title: 'QA Agent Build', detail: 'Built an AI-based QA agent with MCP integrations to automate PR test case generation — reducing manual effort by 50%.' },
+    ],
+    tags: ['AI Testing', 'RAG', 'MCP', 'ETL', 'MongoDB', 'Neo4j', 'ArgoCD', 'Python'],
   },
   {
     company: 'Bridging Technologies',
-    role: 'Software Test Engineer',
+    location: 'Mohali',
+    role: 'QA Engineer',
     period: 'Sep 2024 — Feb 2026',
-    copy: 'Tested complex products across web, Android, iOS, APIs, subscriptions, payment gateways, and backend workflows while improving product and release confidence.',
-    highlights: ['Payment gateway testing', 'API and database testing', 'Cross-platform regression', 'Independent feature ownership']
+    product: 'AI-based social media automation platform + SaaS subscription product',
+    intro: 'Tested complex products across web, Android, and iOS — covering AI content generation, API validation, payment gateway flows, subscription management, and database verification.',
+    highlights: [
+      { title: 'Payment Testing', detail: 'Stripe subscription lifecycle and Nexio one-time payment flows — validated UI, API, webhook events, and database billing state simultaneously.' },
+      { title: 'API & Database', detail: 'REST API testing with backend DB cross-checks via phpMyAdmin — isolating defects beyond what the UI revealed.' },
+      { title: 'Cross-platform', detail: 'Consistent functional and regression coverage across web, Android, and iOS for the same feature set.' },
+      { title: 'AWS Log Monitoring', detail: 'Tracked real-time errors on AWS EC2 instances and validated S3 media storage workflows for production stability.' },
+      { title: 'AI Content QA', detail: 'Validated AI-generated social content, scheduling logic, and NLP outputs against user requirements and platform standards.' },
+    ],
+    tags: ['Stripe', 'Nexio', 'REST API', 'MySQL', 'AWS', 'Android', 'iOS', 'JIRA'],
   },
   {
     company: 'Tiara IT Services',
-    role: 'QA Engineer',
+    location: 'Zirakpur',
+    role: 'Quality Analyst',
     period: 'Jan 2024 — Sep 2024',
-    copy: 'Built the foundation of my QA practice through functional testing, regression, defect reporting, requirement understanding, and close collaboration with product teams.',
-    highlights: ['Functional testing', 'Regression testing', 'Defect analysis', 'Product understanding']
-  }
+    product: 'Cross-platform fitness and booking application',
+    intro: 'Built the foundation of my QA practice — test case design, regression testing, defect lifecycle management, and first exposure to payment validation and test automation tooling.',
+    highlights: [
+      { title: 'Test Case Design', detail: 'Designed structured test cases in TestRail covering functional, regression, and E2E scenarios across web, Android, and iOS.' },
+      { title: 'Nexio Payments', detail: 'Validated one-time payment flows, success/failure states, and backend billing accuracy for the booking system.' },
+      { title: 'Automation Start', detail: 'First automation experience using RainforestQA and Katalon — reducing manual regression effort across release cycles.' },
+      { title: 'Defect Management', detail: 'Managed full defect lifecycle in JIRA — reporting, prioritization, developer collaboration, and resolution verification.' },
+    ],
+    tags: ['TestRail', 'RainforestQA', 'Katalon', 'Nexio', 'JIRA', 'Manual Testing'],
+  },
 ];
 
-const learningCards = [
-  { icon: BrainCircuit, title: 'AI quality evaluation', text: 'Learning how to evaluate RAG, LLM agents, grounding, retrieval quality, and real-world failure modes.' },
-  { icon: Code2, title: 'Automation architecture', text: 'Building scalable Playwright and Python skills through practical product-based automation.' },
-  { icon: Layers3, title: 'System design for testers', text: 'Understanding services, queues, data stores, observability, and how failures travel across a system.' },
-  { icon: BookOpen, title: 'Writing in public', text: 'Turning lessons, bugs, experiments, and technical concepts into useful articles and field notes.' }
+/* ─────────────────────────────────────────────────────────────────
+   HOW I WORK
+───────────────────────────────────────────────────────────────── */
+const methodSteps = [
+  { n: '01', icon: SearchCheck,      title: 'Understand the flow',    body: 'Before writing a single test, I map the system. User journey, API calls, data movement, dependencies. I need to know what normal looks like before I can find what breaks.' },
+  { n: '02', icon: Layers3,          title: 'Analyze risk',           body: 'I identify what is most likely to fail, what would hurt most if it did, and what has been missed before. Coverage is about risk, not checkbox counts.' },
+  { n: '03', icon: Database,         title: 'Validate deeply',        body: "I don't stop at the UI. I check the API response, the database state, the log entry, the downstream system. A bug confirmed at three layers is a bug that stays fixed." },
+  { n: '04', icon: MessageSquareText,title: 'Communicate clearly',    body: 'I turn findings into decisions — not just lists. Severity context, business impact, reproduction confidence, and what needs to happen before release.' },
+  { n: '05', icon: Zap,              title: 'Improve continuously',   body: "After every release I close the gap: what we missed, why, and how we catch it next time. Quality isn't a phase. It's a feedback loop." },
 ];
 
+/* ─────────────────────────────────────────────────────────────────
+   LEARNING
+───────────────────────────────────────────────────────────────── */
+const learningItems = [
+  {
+    icon: BrainCircuit,
+    title: 'AI Evaluation & Guardrails',
+    text: 'Studying LLM evaluation frameworks, retrieval quality metrics, and guardrail testing strategies for production AI systems.',
+    status: 'Active Study',
+    statusColor: '#3a8a56',
+    accent: 'rgba(58,138,86,.12)',
+    what: 'RAGAS, TruLens, DeepEval, Guardrails AI',
+  },
+  {
+    icon: Code2,
+    title: 'Playwright Framework Design',
+    text: 'Building scalable, fixture-driven automation architectures — page objects, data-driven patterns, and CI pipeline integration.',
+    status: 'Building',
+    statusColor: '#c27455',
+    accent: 'rgba(194,116,85,.10)',
+    what: 'Playwright · PyTest · GitHub Actions',
+  },
+  {
+    icon: Layers3,
+    title: 'System Design for Testers',
+    text: 'Understanding queues, event streams, distributed state, and how failures propagate across services — to test systems, not just features.',
+    status: 'Reading',
+    statusColor: '#4a6abf',
+    accent: 'rgba(74,106,191,.10)',
+    what: 'Distributed systems · Observability · Event-driven arch.',
+  },
+  {
+    icon: Database,
+    title: 'SQL, Athena & Data Modeling',
+    text: 'Deepening query proficiency and data modeling understanding for large-scale validation in cloud-hosted analytical environments.',
+    status: 'In Progress',
+    statusColor: '#a8843d',
+    accent: 'rgba(201,169,110,.12)',
+    what: 'AWS Athena · PostgreSQL · Query optimization',
+  },
+];
+
+/* ─────────────────────────────────────────────────────────────────
+   HOOKS
+───────────────────────────────────────────────────────────────── */
+function useTypewriter(words, speed = 78, pause = 2400) {
+  const [display, setDisplay]   = useState('');
+  const [wordIdx, setWordIdx]   = useState(0);
+  const [charIdx, setCharIdx]   = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const word = words[wordIdx];
+    let t;
+    if (!deleting && charIdx < word.length) {
+      t = setTimeout(() => setCharIdx(c => c + 1), speed);
+    } else if (!deleting && charIdx === word.length) {
+      t = setTimeout(() => setDeleting(true), pause);
+    } else if (deleting && charIdx > 0) {
+      t = setTimeout(() => setCharIdx(c => c - 1), speed / 2);
+    } else {
+      setDeleting(false);
+      setWordIdx(i => (i + 1) % words.length);
+    }
+    setDisplay(word.slice(0, charIdx));
+    return () => clearTimeout(t);
+  }, [charIdx, deleting, wordIdx, words, speed, pause]);
+  return display;
+}
+
+function useCountUp(target, duration = 1600) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      io.disconnect();
+      const steps = 48; const inc = target / steps; let cur = 0;
+      const t = setInterval(() => {
+        cur = Math.min(cur + inc, target);
+        setCount(Math.round(cur * 10) / 10);
+        if (cur >= target) clearInterval(t);
+      }, duration / steps);
+    }, { threshold: 0.5 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [target, duration]);
+  return { count, ref };
+}
+
+function useScrollReveal() {
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.09, rootMargin: '0px 0px -36px 0px' }
+    );
+    document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+}
+
+function useScrollProgress() {
+  const [pct, setPct] = useState(0);
+  useEffect(() => {
+    const h = () => { const d = document.documentElement; setPct((d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100); };
+    window.addEventListener('scroll', h, { passive: true });
+    return () => window.removeEventListener('scroll', h);
+  }, []);
+  return pct;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   COMPONENTS
+───────────────────────────────────────────────────────────────── */
+function StatCard({ target, suffix = '', label }) {
+  const { count, ref } = useCountUp(target);
+  return (
+    <div className="bento metric" ref={ref}>
+      <strong>{count}{suffix}</strong>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+function ProjectModal({ project, onClose }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const esc = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', esc);
+    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', esc); };
+  }, [onClose]);
+
+  const m = project.modal;
+  return (
+    <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-panel" role="dialog" aria-modal="true">
+        <div className="modal-head">
+          <div>
+            <small>{project.eyebrow}</small>
+            <h2>{project.title}</h2>
+          </div>
+          <button className="modal-close" onClick={onClose} aria-label="Close"><X size={20} /></button>
+        </div>
+        <div className="modal-body">
+          <Section label="Context">{m.context}</Section>
+          <Section label="What I Did">{m.whatIDid}</Section>
+          <Section label="Responsibilities">
+            <ul className="modal-list">{m.responsibilities.map(r => <li key={r}><CheckCircle2 size={14} /><span>{r}</span></li>)}</ul>
+          </Section>
+          <Section label="Challenges">
+            <ul className="modal-list">{m.challenges.map(c => <li key={c}><span className="modal-dash">—</span><span>{c}</span></li>)}</ul>
+          </Section>
+          <Section label="Testing Approach">{m.approach}</Section>
+          <Section label="Tools Used">
+            <div className="modal-tags">{m.tools.map(t => <span key={t}>{t}</span>)}</div>
+          </Section>
+          <Section label="Achievements">
+            <ul className="modal-list">{m.achievements.map(a => <li key={a}><CheckCircle2 size={14} /><span>{a}</span></li>)}</ul>
+          </Section>
+          <Section label="Impact">{m.impact}</Section>
+          <Section label="Learnings">{m.learnings}</Section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Section({ label, children }) {
+  return (
+    <div className="modal-section">
+      <h4 className="modal-label">{label}</h4>
+      {typeof children === 'string' ? <p>{children}</p> : children}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   APP
+───────────────────────────────────────────────────────────────── */
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [activeProject, setActiveProject] = useState(null);
-  const [theme, setTheme] = useState('dark');
+  const [menuOpen,    setMenuOpen]    = useState(false);
+  const [modal,       setModal]       = useState(null);
+  const [skillFilter, setSkillFilter] = useState('All');
+  const [openExp,     setOpenExp]     = useState(null);
   const [form, setForm] = useState({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' });
+  const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(false);
 
-  const mailto = useMemo(() => {
-    const subject = encodeURIComponent(`${form.topic} — Portfolio enquiry from ${form.name || 'a visitor'}`);
-    const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\nTopic: ${form.topic}\n\nMessage:\n${form.message}`);
-    return `mailto:hello@ankitanandal.com?subject=${subject}&body=${body}`;
-  }, [form]);
+  useScrollReveal();
+  const pct = useScrollProgress();
+  const typed = useTypewriter([
+    'APIs & backend systems.',
+    'ETL pipelines.',
+    'AI / LLM outputs.',
+    'databases & data flows.',
+    'payment gateways.',
+    'integrations.',
+  ]);
 
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    setMenuOpen(false);
+  const handleContactSubmit = async e => {
+    e.preventDefault();
+    setSending(true);
+    setSendError(false);
+    try {
+      const res = await fetch('http://localhost:3001/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (data.success) { setSent(true); }
+      else { setSendError(true); }
+    } catch { setSendError(true); }
+    setSending(false);
   };
 
+  const scrollTo = useCallback(id => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    setMenuOpen(false);
+  }, []);
+
+  const visibleSkills = skillFilter === 'All' ? skillData : skillData.filter(s => s.cat === skillFilter);
+
   return (
-    <div className={theme === 'dark' ? 'app dark' : 'app light'}>
+    <div className="app">
       <div className="noise" />
+      <div className="scroll-progress" style={{ width: `${pct}%` }} />
+      {modal && <ProjectModal project={modal} onClose={() => setModal(null)} />}
+
+      {/* ── NAV ── */}
       <header className="nav-wrap">
         <nav className="nav container">
-          <button className="brand" onClick={() => scrollTo('home')} aria-label="Go to home">
+          <button className="brand" onClick={() => scrollTo('home')}>
             <span className="brand-mark">AN</span>
             <span>Ankita Nandal</span>
           </button>
           <div className="nav-links desktop-nav">
-            {navItems.map(([id, label]) => <button key={id} onClick={() => scrollTo(id)}>{label}</button>)}
+            {navItems.map(([id, label]) => (
+              <button key={id} onClick={() => scrollTo(id)}>{label}</button>
+            ))}
           </div>
           <div className="nav-actions">
-            <button className="icon-btn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Toggle theme"><Moon size={18} /></button>
-            <button className="btn small desktop-cta" onClick={() => scrollTo('contact')}>Start a conversation <ArrowRight size={16} /></button>
-            <button className="icon-btn mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Open menu">{menuOpen ? <X /> : <Menu />}</button>
+            <button className="btn small desktop-cta" onClick={() => scrollTo('contact')}>Reach Out <ArrowRight size={14} /></button>
+            <button className="icon-btn mobile-menu" onClick={() => setMenuOpen(o => !o)}>
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </nav>
-        {menuOpen && <div className="mobile-panel">{navItems.map(([id,label]) => <button key={id} onClick={() => scrollTo(id)}>{label}</button>)}</div>}
+        {menuOpen && (
+          <div className="mobile-panel">
+            {navItems.map(([id, label]) => <button key={id} onClick={() => scrollTo(id)}>{label}</button>)}
+          </div>
+        )}
       </header>
 
       <main>
+        {/* ── HERO ── */}
         <section id="home" className="hero container section-pad">
           <div className="hero-copy">
-            <div className="eyebrow"><Sparkles size={15} /> Product-minded quality engineering</div>
-            <h1>I test beyond the <span>visible screen.</span></h1>
-            <p className="hero-lead">I’m Ankita, an SDET who understands products deeply and tests across user journeys, APIs, data pipelines, databases, automation, integrations, and AI systems.</p>
-            <div className="hero-actions">
-              <button className="btn" onClick={() => scrollTo('work')}>Explore my work <ArrowRight size={18} /></button>
-              <a className="btn ghost" href="/Ankita_Nandal_Resume.pdf" target="_blank" rel="noreferrer"><Download size={18} /> View resume</a>
+            <div className="hero-role reveal">SDET</div>
+            <h1 className="reveal delay-1">
+              The engineer who reads<br />the system — then breaks it.
+            </h1>
+            <p className="hero-typed reveal delay-2">
+              Testing{' '}
+              <span className="typed-word">{typed}<span className="cursor-blink">|</span></span>
+            </p>
+            <p className="hero-lead reveal delay-3">
+              UI, APIs, databases, ETL pipelines, AI/LLM systems, and integrations.
+              I understand flows, trace failures across layers, handle ambiguity, and
+              help teams ship with confidence.
+            </p>
+            <div className="hero-actions reveal delay-4">
+              <button className="btn" onClick={() => scrollTo('work')}>View Work <ArrowRight size={17} /></button>
+              <a className="btn ghost" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
+                <Download size={16} /> Download Resume
+              </a>
+              <button className="btn outline" onClick={() => scrollTo('contact')}>Reach Out</button>
             </div>
-            <div className="social-row">
-              <a href="https://www.linkedin.com" target="_blank" rel="noreferrer"><ExternalLink size={18}/> LinkedIn</a>
-              <a href="https://github.com" target="_blank" rel="noreferrer"><Code2 size={18}/> GitHub</a>
-              <a href="mailto:hello@ankitanandal.com"><Mail size={18}/> Email</a>
+            <div className="social-row reveal delay-4">
+              <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer"><ExternalLink size={14} />LinkedIn</a>
+              <a href="https://github.com" target="_blank" rel="noreferrer"><Code2 size={14} />GitHub</a>
+              <a href="mailto:ankitanandal2009@gmail.com"><Mail size={14} />Email</a>
             </div>
           </div>
+
           <div className="hero-grid">
-            <div className="bento primary-card">
-              <span className="status"><i /> Currently building</span>
-              <h3>Quality systems for complex AI and data products</h3>
-              <p>Connecting product understanding, technical validation, automation, and clear risk communication.</p>
+            <div className="bento primary-card reveal-right delay-1">
+              <span className="status"><i />Currently at Fermi Development</span>
+              <h3>AI platform QA — agents, RAG, ETL, and release confidence</h3>
+              <p>Validating LLM responses, MCP agents, data pipelines, and cross-service sync in a production AI system.</p>
             </div>
-            <div className="bento metric"><strong>2.5+</strong><span>years in quality engineering</span></div>
-            <div className="bento metric"><strong>3</strong><span>product environments</span></div>
-            <div className="bento quote-card"><Quote size={22}/><p>“Quality is not a final checkpoint. It is how the product is understood, challenged, and improved.”</p></div>
+            <StatCard target={2.5} suffix="+" label="years of QA experience" />
+            <StatCard target={3}   suffix=""  label="companies and domains"  />
+            <div className="bento quote-card reveal-right delay-3">
+              <Quote size={18} />
+              <p>"A bug caught before release is trust maintained after it."</p>
+            </div>
           </div>
         </section>
 
-        <section className="marquee-section"><div className="marquee">{[...skills, ...skills].map((s,i)=><span key={i}><CheckCircle2 size={14}/>{s}</span>)}</div></section>
-
+        {/* ── WORK ── */}
         <section id="work" className="container section-pad">
-          <div className="section-heading">
-            <div><div className="eyebrow">SELECTED WORK</div><h2>How I approach difficult quality problems</h2></div>
-            <p>Case studies that show the product context, technical depth, decisions, risks, and outcomes behind the testing.</p>
+          <div className="section-heading reveal">
+            <div>
+              <div className="eyebrow">CASE STUDIES</div>
+              <h2>Real work, real problems, real outcomes</h2>
+            </div>
+            <p>Click any card to open a full case study — context, approach, tools, impact, and learnings.</p>
           </div>
           <div className="project-grid">
             {projects.map((p, i) => {
               const Icon = p.icon;
-              return <article className="project-card" key={p.title}>
-                <div className="project-top"><span className="project-icon"><Icon/></span><span className="project-no">0{i+1}</span></div>
-                <small>{p.eyebrow}</small>
-                <h3>{p.title}</h3>
-                <p>{p.summary}</p>
-                <div className="tags">{p.tags.map(t=><span key={t}>{t}</span>)}</div>
-                <button className="text-btn" onClick={() => setActiveProject(activeProject === i ? null : i)}>View approach <ChevronDown className={activeProject===i?'rotated':''} size={18}/></button>
-                {activeProject === i && <div className="project-details">{p.details.map(d=><div key={d}><CheckCircle2 size={16}/><span>{d}</span></div>)}</div>}
-              </article>
+              return (
+                <article
+                  key={p.id}
+                  className="project-card reveal"
+                  style={{ transitionDelay: `${i * .08}s`, '--accent': p.accentColor }}
+                  onClick={() => setModal(p)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => e.key === 'Enter' && setModal(p)}
+                  aria-label={`Open case study: ${p.title}`}
+                >
+                  <div className="project-top">
+                    <span className="project-icon"><Icon size={22} /></span>
+                    <span className="project-open"><ArrowUpRight size={18} /></span>
+                  </div>
+                  <small>{p.eyebrow}</small>
+                  <h3>{p.title}</h3>
+                  <p>{p.summary}</p>
+                  <div className="tags">{p.tags.map(t => <span key={t}>{t}</span>)}</div>
+                  <span className="project-cta">Open case study <ArrowRight size={15} /></span>
+                </article>
+              );
             })}
           </div>
         </section>
 
-        <section id="experience" className="experience section-pad"><div className="container">
-          <div className="section-heading"><div><div className="eyebrow">EXPERIENCE</div><h2>Growing from feature testing to quality ownership</h2></div><p>My career has moved steadily toward deeper system understanding, broader ownership, and stronger product judgement.</p></div>
-          <div className="timeline">{experience.map((e,i)=><div className="timeline-item" key={e.company}>
-            <div className="timeline-dot">{i+1}</div>
-            <div className="timeline-card"><div className="timeline-head"><div><h3>{e.company}</h3><p>{e.role}</p></div><span>{e.period}</span></div><p>{e.copy}</p><div className="tags">{e.highlights.map(h=><span key={h}>{h}</span>)}</div></div>
-          </div>)}</div>
-        </div></section>
-
-        <section id="learning" className="container section-pad">
-          <div className="section-heading"><div><div className="eyebrow">LEARNING IN PUBLIC</div><h2>What I’m learning, building, and understanding next</h2></div><p>This section will grow into practical notes, articles, experiments, and lessons from real quality problems.</p></div>
-          <div className="learning-grid">{learningCards.map(c=>{const Icon=c.icon;return <article className="learning-card" key={c.title}><Icon/><h3>{c.title}</h3><p>{c.text}</p><span>Notes coming soon <ArrowRight size={15}/></span></article>})}</div>
-          <div className="article-preview">
-            <div><span className="status"><i/> First article in progress</span><h3>How I learned to test an AI system beyond the answer on screen</h3><p>A practical story about tracing retrieval, tools, data, logs, system states, and failure patterns instead of judging only the final response.</p></div>
-            <button className="btn ghost">Read when published <BookOpen size={18}/></button>
+        {/* ── EXPERIENCE ── */}
+        <section id="experience" className="experience-section section-pad">
+          <div className="container">
+            <div className="section-heading reveal">
+              <div>
+                <div className="eyebrow">EXPERIENCE</div>
+                <h2>Three companies, one direction</h2>
+              </div>
+              <p>From functional testing to AI systems — each role added technical depth, broader ownership, and stronger collaboration.</p>
+            </div>
+            <div className="timeline">
+              {experience.map((e, i) => {
+                const isOpen = openExp === i;
+                return (
+                  <div className="timeline-item reveal" key={e.company} style={{ transitionDelay: `${i * .12}s` }}>
+                    <div className="timeline-left">
+                      <div className={`timeline-dot timeline-dot--s${experience.length - i}${e.current ? ' timeline-dot--current' : ''}`}>
+                        {experience.length - i}
+                      </div>
+                      {i < experience.length - 1 && <div className="timeline-line" />}
+                    </div>
+                    <div className="timeline-card">
+                      <div className="timeline-head">
+                        <div>
+                          <h3>{e.company}</h3>
+                          <p>{e.role} · {e.location}</p>
+                          <span className="timeline-product">{e.product}</span>
+                        </div>
+                        <span className="timeline-period">{e.period}</span>
+                      </div>
+                      <p className="timeline-intro">{e.intro}</p>
+                      <button
+                        className="text-btn"
+                        onClick={() => setOpenExp(isOpen ? null : i)}
+                      >
+                        {isOpen ? 'Show less' : 'Show responsibilities'}
+                        <ChevronDown className={isOpen ? 'rotated' : ''} size={17} />
+                      </button>
+                      {isOpen && (
+                        <div className="timeline-details">
+                          {e.highlights.map(h => (
+                            <div className="timeline-highlight" key={h.title}>
+                              <span className="hl-title">{h.title}</span>
+                              <span className="hl-detail">{h.detail}</span>
+                            </div>
+                          ))}
+                          <div className="tags" style={{ marginTop: 16 }}>{e.tags.map(t => <span key={t}>{t}</span>)}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        <section id="about" className="about section-pad"><div className="container about-grid">
-          <div><div className="eyebrow">ABOUT ME</div><h2>I care about the reason a product fails—not only the place where it fails.</h2></div>
-          <div className="about-copy"><p>I began with functional and regression testing, then moved deeper into APIs, databases, payments, data pipelines, automation, and AI systems. My strongest skill is connecting these layers into one complete product story.</p><p>I work best when I can understand the user, the business goal, the architecture, and the release risk together. I ask questions early, challenge unclear assumptions, explore beyond assigned test cases, and communicate issues in a way that helps teams act.</p><div className="principles"><div><SearchCheck/><span><b>Investigate deeply</b>Trace failures across the system.</span></div><div><TestTube2/><span><b>Test with intent</b>Prioritise real risk over test count.</span></div><div><MessageSquareText/><span><b>Communicate clearly</b>Turn technical findings into decisions.</span></div><div><Zap/><span><b>Keep learning</b>Build understanding through practice.</span></div></div></div>
-        </div></section>
+        {/* ── SKILLS & TOOLS ── */}
+        <section id="skills" className="skills-section section-pad">
+          <div className="container">
+            {/* Capabilities */}
+            <div className="section-heading reveal">
+              <div>
+                <div className="eyebrow">TOOLS, TECHNOLOGIES & PLATFORMS</div>
+                <h2>Where I operate and what I use</h2>
+              </div>
+              <p>Capability areas, filterable skills, and the full tech stack — all in one place.</p>
+            </div>
+            <div className="capabilities-grid reveal">
+              {capabilities.map(c => {
+                const Icon = c.icon;
+                return (
+                  <div className="cap-card" key={c.label}>
+                    <Icon size={22} />
+                    <div>
+                      <strong>{c.label}</strong>
+                      <p>{c.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
 
+            {/* AI Quality disciplines — standalone band */}
+            <div className="ai-quality-band reveal" style={{ marginTop: 48 }}>
+              <div className="ai-quality-head">
+                <BrainCircuit size={18} />
+                <div>
+                  <span className="aqb-label">AI Quality Disciplines</span>
+                  <span className="aqb-note">Evaluated through behaviour and contracts — not pass/fail assertions</span>
+                </div>
+              </div>
+              <div className="ai-quality-grid">
+                {aiQualityDisciplines.map(d => (
+                  <div className="ai-quality-card" key={d.n}>
+                    <span className="aqc-dot" />
+                    <div>
+                      <strong>{d.n}</strong>
+                      <p>{d.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bridge */}
+            <div className="stack-bridge reveal">
+              <span className="bridge-line" />
+              <span className="bridge-label">tools & platforms behind the work</span>
+              <span className="bridge-line" />
+            </div>
+
+            {/* Integrated filter → badges + tools together */}
+            <div className="skills-filter reveal" style={{ marginTop: 0 }}>
+              <div className="filter-row">
+                {skillCats.map(cat => (
+                  <button
+                    key={cat}
+                    className={`filter-btn${skillFilter === cat ? ' active' : ''}`}
+                    onClick={() => setSkillFilter(cat)}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* tool chips — filtered by category */}
+              <div className="tool-groups-wrap">
+                {toolGroups
+                  .filter(g => {
+                    if (skillFilter === 'All') return true;
+                    const map = {
+                      'Automation':          'Automation',
+                      'API & Integration':   'API & Integration',
+                      'Databases':           'Databases',
+                      'Data, Search & ETL':  'Data, Search & ETL',
+                      'Cloud & DevOps':      'Cloud & DevOps',
+                      'Test Management':     'Test & Defect Management',
+                      'Performance & Mobile':'Performance & Mobile',
+                      'Payments':            'Payments',
+                    };
+                    return g.label === map[skillFilter];
+                  })
+                  .map(g => (
+                    <div className="tool-group" key={g.label}>
+                      <div className="tool-group-header" style={{ '--gc': g.color }}>
+                        <span>{g.label}</span>
+                        <span>{g.tools.length} tools</span>
+                      </div>
+                      <div className="tool-row">
+                        {g.tools.map(t => (
+                              <div className="tool-chip" key={t.n} style={{ '--gc': g.color }}>
+                                <span className="tool-brand-icon"><BrandIcon icon={t.icon} size={16} color={t.c} /></span>
+                                <span>{t.n}</span>
+                              </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── HOW I WORK ── */}
+        <section className="method-section section-pad">
+          <div className="container">
+            <div className="section-heading reveal">
+              <div>
+                <div className="eyebrow">HOW I WORK</div>
+                <h2>A method, not just a checklist</h2>
+              </div>
+              <p>Quality comes from how you think about a system, not just how many tests you write.</p>
+            </div>
+            <div className="method-grid">
+              {methodSteps.map((s, i) => {
+                const Icon = s.icon;
+                return (
+                  <div className="method-card reveal" key={s.n} style={{ transitionDelay: `${i * .09}s` }}>
+                    <div className="method-num">{s.n}</div>
+                    <div className="method-icon"><Icon size={22} /></div>
+                    <h4>{s.title}</h4>
+                    <p>{s.body}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ── LEARNING ── */}
+        <section id="learning" className="container section-pad">
+          <div className="section-heading reveal">
+            <div>
+              <div className="eyebrow">CONTINUOUS GROWTH</div>
+              <h2>What I'm actively exploring</h2>
+            </div>
+            <p>Each area below reflects a deliberate investment — not just curiosity, but focused depth-building toward where the field is heading.</p>
+          </div>
+          <div className="learning-grid">
+            {learningItems.map((c, i) => {
+              const Icon = c.icon;
+              return (
+                <article
+                  className="learning-card reveal"
+                  key={c.title}
+                  style={{ transitionDelay: `${i * .1}s`, '--learn-accent': c.accent, '--learn-color': c.statusColor }}
+                >
+                  <div className="lc-top">
+                    <div className="lc-icon" style={{ background: c.accent, color: c.statusColor }}>
+                      <Icon size={24} />
+                    </div>
+                    <span className="lc-status" style={{ background: c.accent, color: c.statusColor }}>
+                      {c.status}
+                    </span>
+                  </div>
+                  <h3>{c.title}</h3>
+                  <p>{c.text}</p>
+                  <div className="lc-tools">{c.what}</div>
+                </article>
+              );
+            })}
+          </div>
+          <div className="article-preview reveal">
+            <div>
+              <span className="status"><i />First article in progress</span>
+              <h3>Testing an AI system beyond the answer on screen</h3>
+              <p>Tracing retrieval, MCP tool calls, data pipelines, logs, and failure patterns — rather than asserting on the final response.</p>
+            </div>
+            <button className="btn gold">Read when published <BookOpen size={16} /></button>
+          </div>
+        </section>
+
+        {/* ── RESUME ── */}
+        <section id="resume" className="resume-section section-pad">
+          <div className="container">
+            <div className="section-heading reveal">
+              <div>
+                <div className="eyebrow">RESUME</div>
+                <h2>The formal record</h2>
+              </div>
+              <p>This portfolio shows depth beyond what a resume can. But here's the formal version too.</p>
+            </div>
+            <div className="resume-card reveal">
+              <div className="resume-preview">
+                <div className="resume-mock">
+                  <div className="rm-name">Ankita Nandal</div>
+                  <div className="rm-title">Software Development Engineer in Test</div>
+                  <div className="rm-contact">
+                    <svg width={11} height={11} viewBox="0 0 24 24" fill="#0A66C2" aria-hidden="true" style={{flexShrink:0,marginTop:1}}><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    LinkedIn
+                  </div>
+                  <div className="rm-divider" />
+                  <div className="rm-section">
+                    <div className="rm-section-label">Technical Skills</div>
+                    <div className="rm-skill-line">Testing: Manual · Regression · Functional · E2E · ETL · Prompt · Load</div>
+                    <div className="rm-skill-line">Automation: Playwright (Python) · PyTest · Katalon · RainforestQA</div>
+                    <div className="rm-skill-line">API & DB: Postman · REST API · MySQL · MongoDB · Neo4j · PostgreSQL</div>
+                    <div className="rm-skill-line">AI/ML: LLM Prompt Testing · RAG Validation · MCP Agent Testing</div>
+                    <div className="rm-skill-line">Cloud: AWS EC2 · S3 · OpenSearch · Elasticsearch · Airbyte · ArgoCD</div>
+                  </div>
+                  <div className="rm-divider" />
+                  <div className="rm-section">
+                    <div className="rm-section-label">Experience</div>
+                    <div className="rm-exp-row"><b>Fermi Development</b><span>Feb 2026 – Present</span></div>
+                    <div className="rm-exp-row"><b>Bridging Technologies</b><span>Sep 2024 – Feb 2026</span></div>
+                    <div className="rm-exp-row"><b>Tiara IT Services</b><span>Jan 2024 – Sep 2024</span></div>
+                  </div>
+                </div>
+              </div>
+              <div className="resume-actions">
+                <h3>Ankita Nandal</h3>
+                <p>SDET with 2.5+ years specialising in API testing, ETL validation, AI/LLM testing, database validation, and payment gateway QA.</p>
+                <div className="resume-stats">
+                  <div><strong>2.5+</strong><span>Years experience</span></div>
+                  <div><strong>3</strong><span>Companies</span></div>
+                  <div><strong>8+</strong><span>Skill categories</span></div>
+                  <div><strong>30+</strong><span>Tools in stack</span></div>
+                </div>
+                <a className="btn" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
+                  <Download size={17} /> Download Resume (PDF)
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── CONTACT ── */}
         <section id="contact" className="container section-pad">
-          <div className="contact-shell">
-            <div className="contact-copy"><div className="eyebrow">ASK ANKITA</div><h2>Have a product, quality, or collaboration question?</h2><p>Tell me what you are working on, what is difficult, or what you would like to discuss. Your message will open in your email app.</p><div className="contact-points"><span><CheckCircle2/> Thoughtful quality conversations</span><span><CheckCircle2/> Product and testing opportunities</span><span><CheckCircle2/> Technical collaboration and knowledge sharing</span></div></div>
-            <form className="contact-form" onSubmit={(e)=>{e.preventDefault(); window.location.href=mailto;}}>
-              <label>Name<input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Your name"/></label>
-              <label>Email<input required type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="you@company.com"/></label>
-              <label>What would you like to discuss?<select value={form.topic} onChange={e=>setForm({...form,topic:e.target.value})}><option>Discuss a QA opportunity</option><option>Ask about my work</option><option>Collaborate on a project</option><option>Discuss product quality</option><option>Something else</option></select></label>
-              <label>Message<textarea required rows="5" value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Tell me a little about it..."/></label>
-              <button className="btn" type="submit">Start a conversation <ArrowRight size={18}/></button>
-            </form>
+          <div className="contact-shell reveal">
+            <div className="contact-copy">
+              <div className="eyebrow">REACH OUT</div>
+              <h2>Let's talk testing, quality, or what you're building.</h2>
+              <p>Your message opens directly in your email app. No form submissions lost, no black holes.</p>
+              <div className="contact-links">
+                <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer">
+                  <ExternalLink size={16} /> LinkedIn
+                </a>
+                <a href="https://github.com" target="_blank" rel="noreferrer">
+                  <Code2 size={16} /> GitHub
+                </a>
+              </div>
+              <div className="contact-points">
+                <span><CheckCircle2 size={16} /> Open to full-time SDET and QA engineering roles</span>
+                <span><CheckCircle2 size={16} /> Teams building AI, data, or complex backend systems</span>
+                <span><CheckCircle2 size={16} /> Honest conversations about testing and engineering</span>
+              </div>
+            </div>
+            {sent ? (
+              <div className="contact-success">
+                <CheckCircle2 size={44} strokeWidth={1.5} />
+                <h3>Sent.</h3>
+                <p>Your message landed in my inbox. I'll get back to you soon.</p>
+                <button className="btn btn--outline" onClick={() => { setSent(false); setSendError(false); setForm({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' }); }}>Send another</button>
+              </div>
+            ) : (
+              <form className="contact-form" onSubmit={handleContactSubmit}>
+                <label>Name<input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name" /></label>
+                <label>Email<input required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@company.com" /></label>
+                <label>Topic
+                  <select value={form.topic} onChange={e => setForm({ ...form, topic: e.target.value })}>
+                    <option>Discuss a QA opportunity</option>
+                    <option>Ask about my work</option>
+                    <option>Technical collaboration</option>
+                    <option>Something else</option>
+                  </select>
+                </label>
+                <label>Message<textarea required rows={5} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder={
+                  form.topic === 'Discuss a QA opportunity'  ? 'Tell me about the role, team size, and what you are looking for in a QA engineer...' :
+                  form.topic === 'Ask about my work'         ? 'Which project or area are you curious about? Happy to go deeper...' :
+                  form.topic === 'Technical collaboration'   ? 'What are you building, and where does quality fit in? I would love to hear...' :
+                                                              'Go ahead — what is on your mind?'
+                } /></label>
+                {sendError && <p className="contact-error">Something went wrong — try again or reach me on LinkedIn.</p>}
+                <button className="btn" type="submit" disabled={sending}>{sending ? 'Sending…' : <><span>Start a Conversation</span><ArrowRight size={17} /></>}</button>
+              </form>
+            )}
           </div>
         </section>
       </main>
 
-      <footer><div className="container footer"><div><b>Ankita Nandal</b><span>SDET & Product-Minded Quality Engineer</span></div><div className="footer-links"><a href="mailto:hello@ankitanandal.com">Email</a><a href="https://www.linkedin.com">LinkedIn</a><a href="https://github.com">GitHub</a></div><span>© {new Date().getFullYear()} ankitanandal.com</span></div></footer>
+      <footer>
+        <div className="container footer">
+          <span className="footer-copy">© {new Date().getFullYear()} Ankita Nandal · SDET</span>
+          <span className="footer-copy">Built with React · ankitanandal.com</span>
+        </div>
+      </footer>
     </div>
   );
 }
