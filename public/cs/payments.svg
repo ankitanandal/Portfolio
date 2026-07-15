@@ -1,0 +1,79 @@
+<svg viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <!-- Payment Gateway: User → Checkout → Gateway → Webhook Events → DB Confirmed -->
+  <!-- Accent: #c27455 -->
+
+  <!-- USER / PLAN SELECTION -->
+  <rect x="20" y="100" width="130" height="160" rx="13" fill="#c2745514" stroke="#c27455" stroke-width="1.4"/>
+  <text x="85" y="125" text-anchor="middle" fill="#c27455" font-size="10" font-family="system-ui,sans-serif" font-weight="700">Plan Select</text>
+  <line x1="36" y1="135" x2="134" y2="135" stroke="#c27455" stroke-width=".8" opacity=".3"/>
+  <!-- Plan rows -->
+  <rect x="36" y="146" width="78" height="22" rx="5" fill="#c2745520" stroke="#c27455" stroke-width=".9"/>
+  <text x="75" y="161" text-anchor="middle" fill="#c27455" font-size="8.5" font-family="system-ui,sans-serif" opacity=".8">Starter</text>
+  <rect x="36" y="176" width="78" height="22" rx="5" fill="#c2745530" stroke="#c27455" stroke-width="1.2"/>
+  <text x="75" y="191" text-anchor="middle" fill="#c27455" font-size="8.5" font-family="system-ui,sans-serif" font-weight="700">Pro &#9679;</text>
+  <rect x="36" y="206" width="78" height="22" rx="5" fill="#c2745520" stroke="#c27455" stroke-width=".9"/>
+  <text x="75" y="221" text-anchor="middle" fill="#c27455" font-size="8.5" font-family="system-ui,sans-serif" opacity=".8">Enterprise</text>
+  <text x="85" y="244" text-anchor="middle" fill="#c27455" font-size="8" font-family="monospace" opacity=".55">User checkout</text>
+
+  <!-- Arrow 1 -->
+  <line x1="152" y1="180" x2="188" y2="180" stroke="#c27455" stroke-width="1.4" opacity=".55"/>
+  <polygon points="194,180 186,176 186,184" fill="#c27455" opacity=".65"/>
+
+  <!-- CARD / PAYMENT FORM -->
+  <rect x="194" y="110" width="150" height="140" rx="13" fill="#c2745514" stroke="#c27455" stroke-width="1.4"/>
+  <text x="269" y="135" text-anchor="middle" fill="#c27455" font-size="10" font-family="system-ui,sans-serif" font-weight="700">Payment Form</text>
+  <line x1="210" y1="143" x2="328" y2="143" stroke="#c27455" stroke-width=".8" opacity=".3"/>
+  <!-- Card icon -->
+  <rect x="216" y="154" width="116" height="66" rx="8" fill="#c2745520" stroke="#c27455" stroke-width="1.1"/>
+  <rect x="216" y="168" width="116" height="16" fill="#c27455" opacity=".15"/>
+  <rect x="225" y="192" width="28" height="14" rx="3" fill="#c2745530" stroke="#c27455" stroke-width=".8"/>
+  <rect x="262" y="192" width="28" height="14" rx="3" fill="#c2745530" stroke="#c27455" stroke-width=".8"/>
+  <text x="216" y="237" fill="#c27455" font-size="8.5" font-family="monospace" opacity=".55">  Stripe · Nexio</text>
+
+  <!-- Arrow 2 -->
+  <line x1="346" y1="180" x2="382" y2="180" stroke="#c27455" stroke-width="1.4" opacity=".55"/>
+  <polygon points="388,180 380,176 380,184" fill="#c27455" opacity=".65"/>
+
+  <!-- GATEWAY BOX -->
+  <rect x="388" y="100" width="154" height="160" rx="14" fill="#c2745520" stroke="#c27455" stroke-width="2"/>
+  <text x="465" y="130" text-anchor="middle" fill="#c27455" font-size="12" font-family="system-ui,sans-serif" font-weight="800">Gateway</text>
+  <text x="465" y="147" text-anchor="middle" fill="#c27455" font-size="8.5" font-family="monospace" opacity=".6">Stripe · Nexio</text>
+  <line x1="404" y1="157" x2="526" y2="157" stroke="#c27455" stroke-width=".8" opacity=".3"/>
+  <!-- Transaction state pills -->
+  <rect x="410" y="166" width="104" height="20" rx="6" fill="#c2745518" stroke="#c27455" stroke-width=".9"/>
+  <text x="462" y="180" text-anchor="middle" fill="#c27455" font-size="8.5" font-family="monospace" opacity=".75">pending</text>
+  <rect x="410" y="194" width="104" height="20" rx="6" fill="#c2745518" stroke="#c27455" stroke-width=".9"/>
+  <text x="462" y="208" text-anchor="middle" fill="#c27455" font-size="8.5" font-family="monospace" opacity=".75">processing</text>
+  <rect x="410" y="222" width="104" height="20" rx="6" fill="#c2745528" stroke="#c27455" stroke-width="1.1"/>
+  <text x="462" y="236" text-anchor="middle" fill="#c27455" font-size="8.5" font-family="monospace" font-weight="700">succeeded</text>
+
+  <!-- Arrow 3 -->
+  <line x1="544" y1="180" x2="580" y2="180" stroke="#c27455" stroke-width="1.4" opacity=".55"/>
+  <polygon points="586,180 578,176 578,184" fill="#c27455" opacity=".65"/>
+
+  <!-- WEBHOOK EVENTS -->
+  <rect x="586" y="100" width="172" height="160" rx="13" fill="#c2745514" stroke="#c27455" stroke-width="1.4"/>
+  <text x="672" y="125" text-anchor="middle" fill="#c27455" font-size="10" font-family="system-ui,sans-serif" font-weight="700">Webhooks</text>
+  <line x1="602" y1="134" x2="742" y2="134" stroke="#c27455" stroke-width=".8" opacity=".3"/>
+  <!-- Event list -->
+  <text x="606" y="153" fill="#c27455" font-size="8" font-family="monospace" opacity=".75">payment.created</text>
+  <text x="606" y="170" fill="#c27455" font-size="8" font-family="monospace" opacity=".75">payment.processing</text>
+  <text x="606" y="187" fill="#c27455" font-size="8" font-family="monospace" font-weight="700">payment.succeeded &#10003;</text>
+  <text x="606" y="204" fill="#c27455" font-size="8" font-family="monospace" opacity=".5">subscription.created</text>
+  <text x="606" y="221" fill="#c27455" font-size="8" font-family="monospace" opacity=".5">invoice.paid</text>
+  <text x="606" y="238" fill="#c27455" font-size="8" font-family="monospace" opacity=".4">charge.refunded</text>
+
+  <!-- DB confirmed (bottom center) -->
+  <ellipse cx="400" cy="330" rx="52" ry="14" fill="#c2745518" stroke="#c27455" stroke-width="1.2"/>
+  <rect x="348" y="330" width="104" height="46" fill="#c2745514" stroke="#c27455" stroke-width="1.2"/>
+  <ellipse cx="400" cy="376" rx="52" ry="14" fill="#c2745518" stroke="#c27455" stroke-width="1.2"/>
+  <text x="400" y="357" text-anchor="middle" fill="#c27455" font-size="10.5" font-family="system-ui,sans-serif" font-weight="700">Billing DB</text>
+  <text x="400" y="372" text-anchor="middle" fill="#c27455" font-size="8" font-family="monospace" opacity=".55">state confirmed</text>
+
+  <!-- Downward arrow from gateway to DB -->
+  <line x1="465" y1="262" x2="430" y2="312" stroke="#c27455" stroke-width="1.2" stroke-dasharray="5 3" opacity=".45"/>
+  <polygon points="426,318 425,309 433,312" fill="#c27455" opacity=".55"/>
+  <!-- Downward arrow from webhooks to DB -->
+  <line x1="620" y1="262" x2="456" y2="320" stroke="#c27455" stroke-width="1.2" stroke-dasharray="5 3" opacity=".35"/>
+  <polygon points="452,326 450,317 458,319" fill="#c27455" opacity=".5"/>
+</svg>

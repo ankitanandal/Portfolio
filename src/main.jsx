@@ -59,6 +59,8 @@ const projects = [
     metric: '50% less repetitive QA effort',
     previewFlow: ['Data Source', 'ETL', 'RAG / AI', 'Response'],
     accentColor: '#3a8a56',
+    illustrationImg: '/cs/ai-platform.svg',
+    illustrationAlt: 'System architecture: data sources feed into ETL ingestion and a Vector DB, both flowing into the AI Engine (RAG, LLM, MCP agents) which outputs validated responses',
     modal: {
       context: 'Fermi Development is a B2B SaaS company building an AI-powered enterprise operations platform. It connects business data from documents, databases, applications, and external connectors — processing it through ingestion and transformation pipelines, then making it available to AI agents, search, analytics, and conversational workflows. Every layer is interconnected: a field-mapping error during ingestion can appear as an inaccurate AI response rather than an obvious pipeline error.',
       whatIDid: 'I owned QA across every layer of this platform — UI flows, API collections, database state, pipeline monitoring, and AI response quality — and was the primary person responsible for catching what automated checks missed.',
@@ -102,6 +104,8 @@ const projects = [
     metric: '3 critical bugs caught pre-production',
     previewFlow: ['Source', 'Airbyte ETL', 'Transform', 'Storage'],
     accentColor: '#c9a96e',
+    illustrationImg: '/cs/etl-data.svg',
+    illustrationAlt: 'ETL pipeline diagram: CSV files, SQL database, and API sources converge into an Airbyte transform stage with validation checkpoints, then load into a data warehouse',
     modal: {
       context: 'The platform ingested data from multiple sources — file uploads, API connectors via Airbyte, and database feeds — processing it through transformation layers before storing to MongoDB, building graph relationships in Neo4j, and indexing for search in OpenSearch and Elasticsearch. This data ultimately fed the AI system. Silent data corruption here meant corrupted AI responses.',
       whatIDid: 'Designed and executed systematic source-to-target pipeline validation at every checkpoint — not just at the final output — to catch transformation errors, data loss, and consistency failures before they reached downstream AI consumption.',
@@ -144,6 +148,8 @@ const projects = [
     metric: 'Double-billing webhook bug caught pre-release',
     previewFlow: ['Client', 'Checkout API', 'Payment GW', 'Billing'],
     accentColor: '#c27455',
+    illustrationImg: '/cs/payments.svg',
+    illustrationAlt: 'Payment flow diagram: plan selection to checkout form, through Stripe/Nexio gateway with transaction states, webhook events, and billing database confirmation',
     modal: {
       context: 'The SaaS platform managed user subscriptions through Stripe, handled one-time payments through Nexio, and relied on webhooks to drive billing state changes in real time. Payment bugs directly translated to revenue loss, user trust damage, and support escalations. The platform served web, Android, and iOS simultaneously — each with its own checkout implementation.',
       whatIDid: 'Validated the complete payment lifecycle — from plan selection through checkout, subscription changes, renewals, failures, retries, and webhook processing. Treated each payment flow as a multi-layer system test, not a UI click sequence.',
@@ -187,6 +193,8 @@ const projects = [
     metric: 'Silent scheduling bug caught at peak',
     previewFlow: ['User Input', 'AI Generator', 'NLP Gate', 'Platforms'],
     accentColor: '#8b6f5e',
+    illustrationImg: '/cs/social-ai.svg',
+    illustrationAlt: 'Social AI platform diagram: content brief enters AI Generator, passes NLP quality gate, then schedules to LinkedIn, Instagram, and Twitter via a queue',
     modal: {
       context: 'Bridging Technologies built an AI-powered social media automation platform that generated content, scheduled posts, and managed engagement workflows across LinkedIn, Instagram, and Twitter. The AI layer produced content based on user inputs and platform-specific engagement rules — making output quality, correctness, and compliance central testing concerns.',
       whatIDid: 'Owned end-to-end QA across the AI content layer, API integrations, scheduling engine, backend database, and AWS infrastructure — ensuring the platform behaved correctly and safely across all three social platforms.',
@@ -228,6 +236,8 @@ const projects = [
     metric: 'First structured QA practice built',
     previewFlow: ['Web / Mobile', 'API Gateway', 'Backend', 'DB + Payments'],
     accentColor: '#c9a96e',
+    illustrationImg: '/cs/fitness-app.svg',
+    illustrationAlt: 'Cross-platform QA diagram: fitness and booking app shown on Web monitor, Android phone, and iOS phone — connected with dashed lines indicating cross-platform testing',
     modal: {
       context: 'Tiara IT Services built a cross-platform fitness and booking application serving users across web browsers, Android phones, and iOS devices. The app handled class bookings, subscription management, trainer scheduling, and payment processing through Nexio. Functional consistency across all platforms was a core requirement.',
       whatIDid: 'Designed and executed structured QA across all three platforms — writing test cases, running regression cycles, validating payment flows, and managing the defect lifecycle from discovery to verified fix.',
@@ -605,7 +615,11 @@ function useIntroPast(ref) {
 }
 
 function useTheme() {
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+  const [theme, setTheme] = useState(() => {
+    const initial = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', initial);
+    return initial;
+  });
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
@@ -728,58 +742,32 @@ function SystemMap() {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   METHOD ACCORDION
+   METHOD CARDS
 ───────────────────────────────────────────────────────────────── */
 function MethodAccordion() {
-  const [openStep, setOpenStep] = useState(0);
-
   return (
-    <div className="method-accordion">
-      <div className="method-steps-row" role="tablist">
-        {methodSteps.map((s, i) => {
-          const Icon = s.icon;
-          const isOpen = openStep === i;
-          return (
-            <button
-              key={s.n}
-              className={`method-step-btn${isOpen ? ' active' : ''}`}
-              onClick={() => setOpenStep(isOpen ? null : i)}
-              role="tab"
-              aria-selected={isOpen}
-              aria-controls={`method-panel-${i}`}
-              id={`method-tab-${i}`}
-            >
-              <span className="msb-num">{s.n}</span>
-              <div className="msb-icon"><Icon size={20} /></div>
-              <span className="msb-title">{s.title}</span>
-              <ChevronDown className={`msb-chevron${isOpen ? ' rotated' : ''}`} size={15} />
-            </button>
-          );
-        })}
-      </div>
-
-      {openStep !== null && (
-        <div
-          className="method-step-panel"
-          role="tabpanel"
-          id={`method-panel-${openStep}`}
-          aria-labelledby={`method-tab-${openStep}`}
-        >
-          <div className="msp-inner">
-            <div className="msp-num">{methodSteps[openStep].n}</div>
-            <div>
-              <h4>{methodSteps[openStep].title}</h4>
-              <p>{methodSteps[openStep].body}</p>
-            </div>
+    <div className="method-grid">
+      {methodSteps.map((s, i) => {
+        const Icon = s.icon;
+        return (
+          <div
+            key={s.n}
+            className="method-card reveal"
+            style={{ transitionDelay: `${i * 0.09}s` }}
+          >
+            <div className="method-num">{s.n}</div>
+            <div className="method-icon"><Icon size={22} aria-hidden="true" /></div>
+            <h4>{s.title}</h4>
+            <p>{s.body}</p>
           </div>
-        </div>
-      )}
+        );
+      })}
     </div>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   SKILLS SECTION — collapsible category accordion with filter
+   SKILLS SECTION — capability cards + collapsed tool accordion
 ───────────────────────────────────────────────────────────────── */
 const toolGroupMeta = {
   'Automation':            { Icon: Code2,             desc: 'Playwright, Python, PyTest, Selenium — scalable test frameworks.' },
@@ -803,13 +791,58 @@ function SkillsSection() {
     <div className="skills-wrap">
       <div className="section-heading reveal">
         <div>
-          <div className="eyebrow">SKILLS & TOOLS</div>
+          <div className="eyebrow">TOOLS, TECHNOLOGIES & PLATFORMS</div>
           <h2>Where I operate and what I use</h2>
         </div>
-        <p>Click any category to explore the tools behind the work.</p>
+        <p>Capability areas, filterable skills, and the full tech stack — all in one place.</p>
       </div>
 
-      {/* Category card grid */}
+      {/* Capability cards — 4 × 2 grid */}
+      <div className="capabilities-grid reveal">
+        {capabilities.map(cap => {
+          const Icon = cap.icon;
+          return (
+            <div key={cap.label} className="cap-card">
+              <Icon size={18} />
+              <div>
+                <strong>{cap.label}</strong>
+                <p>{cap.desc}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* AI Quality band — right after capability cards */}
+      <div className="ai-quality-band reveal">
+        <div className="ai-quality-head">
+          <BrainCircuit size={18} />
+          <div>
+            <span className="aqb-label">AI Quality Disciplines</span>
+            <span className="aqb-note">Evaluated through behaviour and contracts — not pass/fail assertions</span>
+          </div>
+        </div>
+        <div className="ai-quality-grid">
+          {aiQualityDisciplines.map(d => (
+            <div className="ai-quality-card" key={d.n}>
+              <span className="aqc-dot" />
+              <div>
+                <strong>{d.n}</strong>
+                <p>{d.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider before tool cards */}
+      <div className="stack-bridge reveal">
+        <div className="bridge-line" />
+        <span className="bridge-label">Tools & Platforms Behind the Work</span>
+        <div className="bridge-line" />
+      </div>
+
+      {/* Category filter cards — click to reveal tools below */}
       <div className="skill-cat-grid reveal">
         {toolGroups.map(g => {
           const meta = toolGroupMeta[g.label] || toolGroupMeta[g.label.replace(' Management', ' Mgmt')] || { Icon: Code2, desc: '' };
@@ -835,7 +868,7 @@ function SkillsSection() {
         })}
       </div>
 
-      {/* Expanded tool cards */}
+      {/* Tools panel — one shared panel below the grid */}
       {activeGroup && (() => {
         const g = toolGroups.find(g => g.label === activeGroup);
         return (
@@ -855,206 +888,13 @@ function SkillsSection() {
           </div>
         );
       })()}
-
-      {/* AI Quality band */}
-      <div className="ai-quality-band reveal">
-        <div className="ai-quality-head">
-          <BrainCircuit size={18} />
-          <div>
-            <span className="aqb-label">AI Quality Disciplines</span>
-            <span className="aqb-note">Evaluated through behaviour and contracts — not pass/fail assertions</span>
-          </div>
-        </div>
-        <div className="ai-quality-grid">
-          {aiQualityDisciplines.map(d => (
-            <div className="ai-quality-card" key={d.n}>
-              <span className="aqc-dot" />
-              <div>
-                <strong>{d.n}</strong>
-                <p>{d.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   CASE STUDY ILLUSTRATION — abstract inline SVG per project
-───────────────────────────────────────────────────────────────── */
-function CaseStudyIllustration({ id, color }) {
-  const bg = `${color}18`;
-  const stroke = color;
-
-  const visuals = {
-    'ai-platform': (
-      <>
-        <circle cx="200" cy="110" r="32" fill={bg} stroke={stroke} strokeWidth="1.5" />
-        <text x="200" y="106" textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="800">AI</text>
-        <text x="200" y="120" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope">Engine</text>
-        {[['RAG', 80, 60], ['ETL', 80, 160], ['MCP', 320, 60], ['DB', 320, 160]].map(([lbl, x, y]) => (
-          <g key={lbl}>
-            <circle cx={x} cy={y} r={22} fill={bg} stroke={stroke} strokeWidth="1" />
-            <text x={x} y={y + 4} textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">{lbl}</text>
-            <line x1={x > 200 ? x - 22 : x + 22} y1={y} x2={x > 200 ? 232 : 168} y2={110} stroke={stroke} strokeWidth="1" strokeDasharray="4 3" />
-          </g>
-        ))}
-      </>
-    ),
-    'etl-data': (
-      <>
-        {[['Source', 60], ['Transform', 190], ['Store', 320]].map(([lbl, x], i) => (
-          <g key={lbl}>
-            <rect x={x - 36} y="90" width="72" height="40" rx="8" fill={bg} stroke={stroke} strokeWidth="1.2" />
-            <text x={x} y="114" textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">{lbl}</text>
-            {i < 2 && <path d={`M${x+36} 110 L${x+56} 110`} stroke={stroke} strokeWidth="1.5" markerEnd="url(#arr)" />}
-          </g>
-        ))}
-        <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill={stroke} /></marker></defs>
-        <text x="200" y="60" textAnchor="middle" fill={stroke} fontSize="10" fontFamily="Manrope" fontWeight="700" opacity="0.6">Pipeline QA</text>
-        {[60, 190, 320].map(x => (
-          <g key={x}>
-            <circle cx={x} cy="160" r={4} fill={stroke} opacity="0.5" />
-            <line x1={x} y1="130" x2={x} y2="155" stroke={stroke} strokeWidth="1" strokeDasharray="3 3" />
-          </g>
-        ))}
-      </>
-    ),
-    'payments': (
-      <>
-        <rect x="120" y="75" width="160" height="90" rx="12" fill={bg} stroke={stroke} strokeWidth="1.5" />
-        <rect x="120" y="95" width="160" height="18" fill={stroke} opacity="0.15" />
-        <text x="200" y="108" textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">PAYMENT GATEWAY</text>
-        <text x="200" y="140" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope">Stripe · Nexio · Webhooks</text>
-        <circle cx="90" cy="110" r="20" fill={bg} stroke={stroke} strokeWidth="1" />
-        <text x="90" y="114" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope" fontWeight="700">UI</text>
-        <circle cx="310" cy="110" r="20" fill={bg} stroke={stroke} strokeWidth="1" />
-        <text x="310" y="114" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope" fontWeight="700">DB</text>
-        <line x1="110" y1="110" x2="120" y2="110" stroke={stroke} strokeWidth="1.5" />
-        <line x1="280" y1="110" x2="290" y2="110" stroke={stroke} strokeWidth="1.5" />
-      </>
-    ),
-    'social-ai': (
-      <>
-        <circle cx="200" cy="100" r="28" fill={bg} stroke={stroke} strokeWidth="1.5" />
-        <text x="200" y="97" textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="800">AI</text>
-        <text x="200" y="111" textAnchor="middle" fill={stroke} fontSize="7" fontFamily="Manrope">Content</text>
-        {[['LI', 80, 75], ['IG', 80, 135], ['TW', 320, 75], ['DB', 320, 135]].map(([lbl, x, y]) => (
-          <g key={lbl}>
-            <rect x={x - 18} y={y - 16} width="36" height="32" rx="7" fill={bg} stroke={stroke} strokeWidth="1" />
-            <text x={x} y={y + 4} textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">{lbl}</text>
-            <line x1={x > 200 ? x - 18 : x + 18} y1={y} x2={x > 200 ? 228 : 172} y2={100} stroke={stroke} strokeWidth="1" strokeDasharray="4 3" />
-          </g>
-        ))}
-      </>
-    ),
-    'fitness-app': (
-      <>
-        {[['Web', 90, 110, 36], ['Android', 200, 110, 32], ['iOS', 310, 110, 32]].map(([lbl, x, y, r]) => (
-          <g key={lbl}>
-            <circle cx={x} cy={y} r={r} fill={bg} stroke={stroke} strokeWidth="1.2" />
-            <text x={x} y={y + 4} textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">{lbl}</text>
-          </g>
-        ))}
-        <line x1="126" y1="110" x2="168" y2="110" stroke={stroke} strokeWidth="1" strokeDasharray="4 3" />
-        <line x1="232" y1="110" x2="278" y2="110" stroke={stroke} strokeWidth="1" strokeDasharray="4 3" />
-        <text x="200" y="60" textAnchor="middle" fill={stroke} fontSize="10" fontFamily="Manrope" fontWeight="700" opacity="0.6">Cross-Platform QA</text>
-        <text x="200" y="175" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope" opacity="0.6">TestRail · JIRA · Nexio</text>
-      </>
-    ),
-  };
-
-  return (
-    <svg
-      viewBox="0 0 400 220"
-      className="cs-illus"
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect width="400" height="220" fill={bg} rx="2" />
-      {visuals[id] ?? <rect x="0" y="0" width="400" height="220" fill={bg} />}
-    </svg>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────
    CASE STUDY SECTION — split layout
 ───────────────────────────────────────────────────────────────── */
-/* ── Simple 4-node flow diagram for the preview card ── */
-function CaseStudyPreviewVisual({ flow, color }) {
-  /*
-   * Layout math (viewBox 400 × 170):
-   *   NW=82, NH=60, GAP=16, pad=12
-   *   xs = [12, 110, 208, 306]  → last right edge 306+82=388 ≤ 400 ✓
-   *   cY = 88  (node centre Y)
-   *   node top = cY-NH/2=58,  node bottom = cY+NH/2=118
-   */
-  const NW = 82, NH = 60, cY = 88, GAP = 16;
-  const xs = flow.map((_, i) => 12 + i * (NW + GAP));
-  const nodeTop = cY - NH / 2;
-
-  const splitLabel = (label) => {
-    const words = label.split(' ');
-    if (words.length <= 2) return [label, null];
-    const half = Math.ceil(words.length / 2);
-    return [words.slice(0, half).join(' '), words.slice(half).join(' ')];
-  };
-
-  return (
-    <svg viewBox="0 0 400 170" className="cs-preview-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-      <rect width="400" height="170" fill="var(--illus-bg)"/>
-      <rect width="400" height="3" fill={color} opacity=".5"/>
-      <text x="14" y="26" fontSize="8.5" fontFamily="DM Mono,monospace"
-        fontWeight="700" fill={color} opacity=".65" letterSpacing="1.2">SYSTEM FLOW</text>
-      <line x1={xs[0]} y1={cY} x2={xs[3] + NW} y2={cY}
-        stroke={color} strokeWidth=".8" opacity=".12" strokeDasharray="5 4"/>
-      {[0, 1, 2].map(i => {
-        const x1 = xs[i] + NW + 2, x2 = xs[i + 1] - 2;
-        return (
-          <g key={i}>
-            <line x1={x1} y1={cY} x2={x2 - 8} y2={cY}
-              stroke={color} strokeWidth="1.8" opacity=".5" strokeLinecap="round"/>
-            <polygon points={`${x2},${cY} ${x2-8},${cY-5} ${x2-8},${cY+5}`}
-              fill={color} opacity=".7"/>
-          </g>
-        );
-      })}
-      {flow.map((label, i) => {
-        const x = xs[i], cx = x + NW / 2;
-        const [l1, l2] = splitLabel(label);
-        const ty1 = l2 ? cY - 3 : cY + 5;
-        return (
-          <g key={i}>
-            <rect x={x} y={nodeTop} width={NW} height={NH} rx="9"
-              fill={color} opacity=".1"/>
-            <rect x={x} y={nodeTop} width={NW} height={NH} rx="9"
-              fill="none" stroke={color} strokeWidth="1.6"/>
-            <rect x={x+7} y={nodeTop+7} width="18" height="11" rx="3"
-              fill={color} opacity=".22"/>
-            <text x={x+16} y={nodeTop+16} textAnchor="middle"
-              fontSize="7" fontFamily="DM Mono,monospace" fontWeight="700" fill={color}>
-              {String(i + 1).padStart(2, '0')}
-            </text>
-            <text x={cx} y={ty1} textAnchor="middle"
-              fontSize="10.5" fontWeight="800" fontFamily="Manrope,sans-serif"
-              fill="var(--illus-fg)">{l1}</text>
-            {l2 && (
-              <text x={cx} y={ty1+13} textAnchor="middle"
-                fontSize="10" fontWeight="700" fontFamily="Manrope,sans-serif"
-                fill={color}>{l2}</text>
-            )}
-          </g>
-        );
-      })}
-      <text x="200" y="156" textAnchor="middle"
-        fontSize="8" fontFamily="DM Mono,monospace"
-        fill={color} opacity=".5" letterSpacing=".6">✓ quality validated at each layer</text>
-    </svg>
-  );
-}
-
 function CaseStudySection() {
   const [activeIdx, setActiveIdx] = useState(0);
   const navigate = useNavigate();
@@ -1066,9 +906,15 @@ function CaseStudySection() {
       <div className="cs-preview">
         <div className="cs-preview-card reveal-left">
 
-          {/* Visual area — theme-adaptive background, simple flow diagram */}
+          {/* Visual area */}
           <div className="cs-illus-wrap">
-            <CaseStudyPreviewVisual flow={p.previewFlow} color={p.accentColor} />
+            <img
+              src={p.illustrationImg}
+              alt={p.illustrationAlt}
+              loading="lazy"
+              decoding="async"
+              className="cs-illus"
+            />
           </div>
 
           {/* Content area — lighter */}
@@ -1125,63 +971,102 @@ function CaseStudySection() {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   EXPERIENCE SECTION — vertical timeline
+   EXPERIENCE SECTION — split layout (desktop) / accordion (mobile)
 ───────────────────────────────────────────────────────────────── */
+function ExperienceDetail({ exp: e }) {
+  return (
+    <>
+      <div className="exp-detail-header">
+        <div className="exp-di-title">
+          <div className="exp-detail-company">{e.company}</div>
+          <div className="exp-detail-role">{e.role}</div>
+          <span className="exp-detail-product">{e.product}</span>
+        </div>
+        <div className="exp-di-badges">
+          {e.current && <span className="exp-current-badge">Current</span>}
+          <span className="timeline-period">{e.period}</span>
+        </div>
+      </div>
+      <p className="exp-detail-intro">{e.intro}</p>
+      <div className="exp-section-label">Responsibilities</div>
+      <div className="exp-highlights">
+        {e.highlights.map(h => (
+          <div className="exp-highlight-row" key={h.title}>
+            <span className="hl-title">{h.title}</span>
+            <span className="hl-detail">{h.detail}</span>
+          </div>
+        ))}
+      </div>
+      <div className="exp-section-label">Tools &amp; Technologies</div>
+      <div className="tags exp-tags">
+        {e.tags.map(t => <span key={t}>{t}</span>)}
+      </div>
+    </>
+  );
+}
+
 function ExperienceSection() {
-  const [openIdx, setOpenIdx] = useState(0);
+  const [activeIdx, setActiveIdx] = useState(0);
 
   return (
-    <div className="exp-timeline">
-      {experience.map((e, i) => {
-        const isOpen = openIdx === i;
-        return (
-          <div key={e.company} className={`exp-entry${isOpen ? ' open' : ''}`}>
-            {/* Timeline dot + line */}
-            <div className="exp-track">
-              <div className="exp-dot" />
-              {i < experience.length - 1 && <div className="exp-line" />}
-            </div>
-
-            {/* Content */}
-            <div className="exp-content">
+    <>
+      {/* Desktop: company list left, detail panel right */}
+      <div className="exp-selector">
+        <div className="exp-companies">
+          {experience.map((e, i) => {
+            const isAct = activeIdx === i;
+            return (
               <button
-                className="exp-header"
-                onClick={() => setOpenIdx(isOpen ? -1 : i)}
+                key={e.company}
+                className={`exp-company-btn${isAct ? ' active' : ''}`}
+                onClick={() => setActiveIdx(i)}
+                aria-pressed={isAct}
+              >
+                <div className="ecb-content">
+                  <strong>{e.company}</strong>
+                  <span>{e.role}</span>
+                  <span className="ecb-period">{e.period}</span>
+                </div>
+                {e.current && <span className="exp-current-badge">Current</span>}
+              </button>
+            );
+          })}
+        </div>
+        <div className="exp-detail" key={activeIdx}>
+          <ExperienceDetail exp={experience[activeIdx]} />
+        </div>
+      </div>
+
+      {/* Mobile: accordion per company */}
+      <div className="exp-accordion">
+        {experience.map((e, i) => {
+          const isOpen = activeIdx === i;
+          return (
+            <div key={e.company} className={`exp-acc-item${isOpen ? ' open' : ''}`}>
+              <button
+                className="exp-acc-trigger"
+                onClick={() => setActiveIdx(isOpen ? -1 : i)}
                 aria-expanded={isOpen}
               >
-                <div className="exp-header-left">
-                  <span className="exp-company">{e.company}</span>
-                  {e.current && <span className="exp-current-pill">Current</span>}
+                <div className="exp-acc-content">
+                  <div className="exp-acc-company">
+                    {e.company}
+                    {e.current && <span className="exp-current-badge">Current</span>}
+                  </div>
+                  <span className="exp-acc-sub">{e.role} · {e.period}</span>
                 </div>
-                <div className="exp-header-right">
-                  <span className="exp-role-tag">{e.role}</span>
-                  <span className="exp-period">{e.period}</span>
-                  <ChevronDown className={`exp-chevron${isOpen ? ' rotated' : ''}`} size={16} />
-                </div>
+                <ChevronDown className={`exp-chevron${isOpen ? ' rotated' : ''}`} size={16} />
               </button>
-
               {isOpen && (
-                <div className="exp-body">
-                  <p className="exp-product">{e.product}</p>
-                  <p className="exp-intro">{e.intro}</p>
-                  <div className="exp-highlights">
-                    {e.highlights.map(h => (
-                      <div className="exp-hl" key={h.title}>
-                        <span className="exp-hl-title">{h.title}</span>
-                        <span className="exp-hl-detail">{h.detail}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="tags" style={{ marginTop: 18 }}>
-                    {e.tags.map(t => <span key={t}>{t}</span>)}
-                  </div>
+                <div className="exp-acc-body">
+                  <ExperienceDetail exp={e} />
                 </div>
               )}
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
@@ -1212,12 +1097,19 @@ function StickyNav({ activeSection, scrollTo, menuOpen, setMenuOpen, visible, th
         </div>
         <div className="nav-actions">
           <button
-            className="icon-btn theme-toggle"
+            className="icon-btn theme-toggle desktop-cta"
             onClick={toggleTheme}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
           >
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+          <span className="nav-sep desktop-cta" aria-hidden="true" />
+          <button
+            className="btn small desktop-cta"
+            onClick={() => scrollTo('contact')}
+          >
+            Reach Out <ArrowRight size={14} />
           </button>
           <button
             className="icon-btn mobile-menu"
@@ -1245,36 +1137,45 @@ function StickyNav({ activeSection, scrollTo, menuOpen, setMenuOpen, visible, th
 ───────────────────────────────────────────────────────────────── */
 function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed, theme, toggleTheme }) {
   return (
-    <div className="intro-card-wrap" id="home">
-      <div className="intro-card">
+    <div id="home" className="hero-page">
 
-        {/* A. Top navigation strip */}
-        <nav className="intro-nav" aria-label="Main navigation">
-          <button className="intro-nav-brand" onClick={() => scrollTo('home')} aria-label="Go to top">
-            <span className="intro-nav-mark" aria-hidden="true">AN</span>
+      {/* ── TOP NAV BAR ── */}
+      <header className="hero-nav-bar">
+        <div className="container hero-nav-inner">
+          <button className="hero-brand" onClick={() => scrollTo('home')} aria-label="Go to top">
+            <span className="hero-brand-mark" aria-hidden="true">
+              <CheckCircle2 size={16} />
+            </span>
           </button>
 
-          <div className="intro-nav-links desktop-nav">
+          <nav className="hero-nav-links desktop-nav" aria-label="Main navigation">
             {navItems.map(([id, label]) => (
               <button
                 key={id}
                 onClick={() => scrollTo(id)}
-                className={activeSection === id ? 'intro-nav-active' : ''}
+                className={activeSection === id ? 'hero-nav-active' : ''}
                 aria-current={activeSection === id ? 'location' : undefined}
               >
                 {label}
               </button>
             ))}
-          </div>
+          </nav>
 
-          <div className="intro-nav-actions">
+          <div className="hero-nav-actions">
             <button
-              className="icon-btn theme-toggle"
+              className="icon-btn theme-toggle desktop-cta"
               onClick={toggleTheme}
               aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
             >
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+            <span className="nav-sep desktop-cta" aria-hidden="true" />
+            <button
+              className="btn small desktop-cta"
+              onClick={() => scrollTo('contact')}
+            >
+              Reach Out <ArrowRight size={14} />
             </button>
             <button
               className="icon-btn mobile-menu"
@@ -1285,66 +1186,69 @@ function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed, them
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
-        </nav>
+        </div>
 
         {menuOpen && (
-          <div className="intro-mobile-panel" role="navigation" aria-label="Mobile navigation">
+          <div className="mobile-panel" role="navigation" aria-label="Mobile navigation">
             {navItems.map(([id, label]) => (
               <button key={id} onClick={() => scrollTo(id)}>{label}</button>
             ))}
           </div>
         )}
+      </header>
 
-        {/* B + C. Body: identity left, copy right */}
-        <div className="intro-body">
+      {/* ── HERO BODY ── */}
+      <div className="hero-body container">
 
-          {/* B. Identity panel */}
-          <div className="intro-identity reveal">
-            <h2 className="intro-name">Ankita<br />Nandal</h2>
-            <span className="intro-role-title">Software Development Engineer in Test</span>
-            <div className="intro-steps">
-              {['Plan','Build','Test','Ship'].map((s, i, arr) => (
-                <span key={s}>{s}{i < arr.length - 1 && <span className="intro-step-dot"> · </span>}</span>
-              ))}
-            </div>
+        {/* LEFT — identity */}
+        <div className="hero-identity reveal">
+          <span className="hero-hey">Hey, I'm</span>
+          <h1 className="hero-name">Ankita<br />Nandal</h1>
+          <p className="hero-role-title">Software Development Engineer in Test</p>
+          <div className="hero-steps">
+            {['Plan','Build','Test','Ship'].map((s, i, arr) => (
+              <span key={s}>
+                {s}
+                {i < arr.length - 1 && <span className="hero-step-sep"> · </span>}
+              </span>
+            ))}
           </div>
-
-          {/* C. Statement + actions panel */}
-          <div className="intro-copy">
-            <div className="intro-divider-top" aria-hidden="true" />
-            <h1 className="intro-headline reveal delay-1">
-              The engineer who reads the system
-              <span className="intro-break"> then breaks it.</span>
-            </h1>
-            <p className="hero-typed reveal delay-2">
-              Testing{' '}
-              <span className="typed-word">{typed}<span className="cursor-blink">|</span></span>
-            </p>
-            <p className="intro-lead reveal delay-3">
-              UI, APIs, databases, ETL pipelines, AI/LLM systems, and integrations.
-              I understand flows, trace failures across layers, handle ambiguity, and
-              help teams ship with confidence.
-            </p>
-            <div className="intro-actions reveal delay-4">
-              <button className="btn" onClick={() => scrollTo('work')}>View Work <ArrowRight size={17} /></button>
-              <a className="btn ghost" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
-                <Download size={16} /> Download Resume
-              </a>
-            </div>
-            <div className="social-row reveal delay-4">
-              <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer">
-                <LinkedInIcon size={14} color="#0A66C2" /> LinkedIn
-              </a>
-              <a href="https://github.com" target="_blank" rel="noreferrer">
-                <BrandIcon icon={siGithub} size={14} color="var(--text)" /> GitHub
-              </a>
-              <a href="mailto:ankitanandal2009@gmail.com">
-                <Mail size={14} /> Email
-              </a>
-            </div>
-          </div>
-
         </div>
+
+        {/* RIGHT — copy */}
+        <div className="hero-copy-col">
+          <h1 className="hero-headline reveal delay-1">
+            The engineer who reads the system
+            <span className="hero-headline-italic"> then breaks it.</span>
+          </h1>
+          <p className="hero-typed-line reveal delay-2">
+            Testing{' '}
+            <span className="typed-word">{typed}<span className="cursor-blink">|</span></span>
+          </p>
+          <p className="hero-lead reveal delay-3">
+            UI, APIs, databases, ETL pipelines, AI/LLM systems, and integrations.
+            I understand flows, trace failures across layers, handle ambiguity, and
+            help teams ship with confidence.
+          </p>
+          <div className="hero-actions reveal delay-4">
+            <button className="btn" onClick={() => scrollTo('work')}>View Work <ArrowRight size={17} /></button>
+            <a className="btn ghost" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
+              <Download size={16} /> Download Resume
+            </a>
+          </div>
+          <div className="social-row reveal delay-4">
+            <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer">
+              <LinkedInIcon size={14} color="#0A66C2" /> LinkedIn
+            </a>
+            <a href="https://github.com" target="_blank" rel="noreferrer">
+              <BrandIcon icon={siGithub} size={14} color="var(--text)" /> GitHub
+            </a>
+            <a href="mailto:ankitanandal2009@gmail.com">
+              <Mail size={14} /> Email
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -1447,7 +1351,13 @@ function CaseStudyDetailPage() {
           {/* Header */}
           <header className="cd-header reveal">
             <div className="cd-illus-hero">
-              <CaseStudyIllustration id={project.id} color={project.accentColor} />
+              <img
+                src={project.illustrationImg}
+                alt={project.illustrationAlt}
+                loading="lazy"
+                decoding="async"
+                className="cs-illus"
+              />
             </div>
             <small className="cd-eyebrow" style={{ color: project.accentColor }}>{project.eyebrow}</small>
             <h1 className="cd-title">{project.title}</h1>
@@ -1752,7 +1662,7 @@ function MainPage() {
               <div className="contact-copy">
                 <div className="eyebrow">REACH OUT</div>
                 <h2>Let's talk testing, quality, or what you're building.</h2>
-                <p>Your message opens directly in my inbox. No form submissions lost, no black holes.</p>
+                <p>A role, a project, a question, or just a good conversation about testing. Happy to hear from you.</p>
 
                 <div className="contact-links">
                   <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer" aria-label="LinkedIn profile">
@@ -1760,9 +1670,6 @@ function MainPage() {
                   </a>
                   <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub profile">
                     <BrandIcon icon={siGithub} size={18} color="var(--text)" /> GitHub
-                  </a>
-                  <a href="mailto:ankitanandal2009@gmail.com" aria-label="Send email">
-                    <BrandIcon icon={siGmail} size={18} color="#EA4335" /> Gmail
                   </a>
                 </div>
 
