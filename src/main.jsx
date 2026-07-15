@@ -1097,7 +1097,7 @@ function StickyNav({ activeSection, scrollTo, menuOpen, setMenuOpen, visible, th
         </div>
         <div className="nav-actions">
           <button
-            className="icon-btn theme-toggle desktop-cta"
+            className="icon-btn theme-toggle"
             onClick={toggleTheme}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
@@ -1163,7 +1163,7 @@ function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed, them
 
           <div className="hero-nav-actions">
             <button
-              className="icon-btn theme-toggle desktop-cta"
+              className="icon-btn theme-toggle"
               onClick={toggleTheme}
               aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
