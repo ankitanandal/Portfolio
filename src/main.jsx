@@ -41,7 +41,6 @@ const navItems = [
   ['work',       'Work'],
   ['experience', 'Experience'],
   ['resume',     'Resume'],
-  ['contact',    'Reach Out'],
 ];
 
 /* ─────────────────────────────────────────────────────────────────
@@ -782,60 +781,82 @@ function MethodAccordion() {
 /* ─────────────────────────────────────────────────────────────────
    SKILLS SECTION — collapsible category accordion with filter
 ───────────────────────────────────────────────────────────────── */
-const SKILL_FILTERS = [
-  { label: 'All',        groups: null },
-  { label: 'Testing',    groups: ['Automation', 'API & Integration', 'Test & Defect Management', 'Performance & Mobile'] },
-  { label: 'Automation', groups: ['Automation'] },
-  { label: 'Data',       groups: ['Data, Search & ETL', 'Databases'] },
-  { label: 'AI',         groups: ['API & Integration', 'Automation', 'Data, Search & ETL'] },
-  { label: 'Cloud',      groups: ['Cloud & DevOps'] },
-  { label: 'Management', groups: ['Test & Defect Management'] },
-];
+const toolGroupMeta = {
+  'Automation':            { Icon: Code2,             desc: 'Playwright, Python, PyTest, Selenium — scalable test frameworks.' },
+  'API & Integration':     { Icon: Webhook,            desc: 'Postman, REST APIs, Webhooks, OpenAI API.' },
+  'Databases':             { Icon: Database,           desc: 'MySQL, PostgreSQL, MongoDB, Neo4j, phpMyAdmin.' },
+  'Data, Search & ETL':    { Icon: GitBranch,          desc: 'Airbyte, OpenSearch, Elasticsearch, AWS Athena, SQL.' },
+  'Cloud & DevOps':        { Icon: Cloud,              desc: 'AWS, ArgoCD, Docker, Git, Linux.' },
+  'Test & Defect Mgmt':    { Icon: CheckCircle2,       desc: 'Jira, TestRail — full defect lifecycle management.' },
+  'Performance & Mobile':  { Icon: Zap,                desc: 'JMeter, TestFlight, Android, iOS.' },
+  'Payments':              { Icon: ShieldCheck,        desc: 'Stripe subscriptions, Nexio transactions, webhooks.' },
+};
 
 function SkillsSection() {
-  const [filter, setFilter] = useState('All');
-  const [openCats, setOpenCats] = useState(new Set());
+  const [activeGroup, setActiveGroup] = useState(null);
 
-  const toggleCat = useCallback(label => {
-    setOpenCats(prev => {
-      const next = new Set(prev);
-      if (next.has(label)) next.delete(label); else next.add(label);
-      return next;
-    });
+  const handleCatClick = useCallback(label => {
+    setActiveGroup(prev => prev === label ? null : label);
   }, []);
-
-  const activeFilter = SKILL_FILTERS.find(f => f.label === filter);
-  const visibleGroups = activeFilter.groups
-    ? toolGroups.filter(g => activeFilter.groups.includes(g.label))
-    : toolGroups;
 
   return (
     <div className="skills-wrap">
-      {/* Capabilities */}
       <div className="section-heading reveal">
         <div>
-          <div className="eyebrow">TOOLS, TECHNOLOGIES & PLATFORMS</div>
+          <div className="eyebrow">SKILLS & TOOLS</div>
           <h2>Where I operate and what I use</h2>
         </div>
-        <p>Capability areas, filterable skills, and the full tech stack — all in one place.</p>
+        <p>Click any category to explore the tools behind the work.</p>
       </div>
 
-      <div className="capabilities-grid reveal">
-        {capabilities.map(c => {
-          const Icon = c.icon;
+      {/* Category card grid */}
+      <div className="skill-cat-grid reveal">
+        {toolGroups.map(g => {
+          const meta = toolGroupMeta[g.label] || toolGroupMeta[g.label.replace(' Management', ' Mgmt')] || { Icon: Code2, desc: '' };
+          const Icon = meta.Icon;
+          const isActive = activeGroup === g.label;
           return (
-            <div className="cap-card" key={c.label}>
-              <Icon size={20} />
-              <div>
-                <strong>{c.label}</strong>
-                <p>{c.desc}</p>
+            <button
+              key={g.label}
+              className={`skill-cat-card${isActive ? ' active' : ''}`}
+              onClick={() => handleCatClick(g.label)}
+              style={{ '--cat-color': g.color }}
+              aria-expanded={isActive}
+            >
+              <div className="scc-top">
+                <span className="scc-icon"><Icon size={18} /></span>
+                <span className="scc-count">{g.tools.length}</span>
               </div>
-            </div>
+              <strong className="scc-label">{g.label}</strong>
+              <p className="scc-desc">{meta.desc}</p>
+              <ChevronDown className={`scc-chevron${isActive ? ' rotated' : ''}`} size={14} />
+            </button>
           );
         })}
       </div>
 
-      {/* AI Quality disciplines */}
+      {/* Expanded tool cards */}
+      {activeGroup && (() => {
+        const g = toolGroups.find(g => g.label === activeGroup);
+        return (
+          <div className="skill-tools-panel" key={activeGroup}>
+            <div className="skill-tools-grid">
+              {g.tools.map((t, i) => (
+                <div
+                  className="skill-tool-card"
+                  key={t.n}
+                  style={{ '--cat-color': g.color, animationDelay: `${i * 0.05}s` }}
+                >
+                  <span className="stc-icon"><BrandIcon icon={t.icon} size={22} color={t.c} /></span>
+                  <span className="stc-name">{t.n}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* AI Quality band */}
       <div className="ai-quality-band reveal">
         <div className="ai-quality-head">
           <BrainCircuit size={18} />
@@ -855,60 +876,6 @@ function SkillsSection() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Bridge */}
-      <div className="stack-bridge reveal">
-        <span className="bridge-line" /><span className="bridge-label">tools & platforms behind the work</span><span className="bridge-line" />
-      </div>
-
-      {/* Filter */}
-      <div className="filter-row reveal">
-        {SKILL_FILTERS.map(f => (
-          <button
-            key={f.label}
-            className={`filter-btn${filter === f.label ? ' active' : ''}`}
-            onClick={() => setFilter(f.label)}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Accordion */}
-      <div className="acc-cats">
-        {visibleGroups.map(g => {
-          const isOpen = openCats.has(g.label);
-          return (
-            <div key={g.label} className={`acc-cat${isOpen ? ' open' : ''}`}>
-              <button
-                className="acc-cat-btn"
-                onClick={() => toggleCat(g.label)}
-                aria-expanded={isOpen}
-                style={{ '--gc': g.color }}
-              >
-                <div className="acc-cat-left">
-                  <span className="acc-cat-bar" style={{ background: g.color }} />
-                  <span className="acc-cat-name">{g.label}</span>
-                  <span className="acc-cat-count">{g.tools.length} tools</span>
-                </div>
-                <ChevronDown className={`acc-chevron${isOpen ? ' rotated' : ''}`} size={17} />
-              </button>
-              {isOpen && (
-                <div className="acc-cat-body">
-                  <div className="tool-row">
-                    {g.tools.map(t => (
-                      <div className="tool-chip" key={t.n} style={{ '--gc': g.color }}>
-                        <span className="tool-brand-icon"><BrandIcon icon={t.icon} size={16} color={t.c} /></span>
-                        <span>{t.n}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
       </div>
     </div>
   );
@@ -1158,59 +1125,62 @@ function CaseStudySection() {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   EXPERIENCE SECTION — company selector
+   EXPERIENCE SECTION — vertical timeline
 ───────────────────────────────────────────────────────────────── */
 function ExperienceSection() {
-  const [activeComp, setActiveComp] = useState(0);
-  const exp = experience[activeComp];
+  const [openIdx, setOpenIdx] = useState(0);
 
   return (
-    <div className="exp-selector">
-      {/* Left: company list */}
-      <nav className="exp-companies" aria-label="Company list">
-        {experience.map((e, i) => {
-          const isAct = activeComp === i;
-          return (
-            <button
-              key={e.company}
-              className={`exp-company-btn${isAct ? ' active' : ''}`}
-              onClick={() => setActiveComp(i)}
-              aria-pressed={isAct}
-            >
-              <div className="ecb-content">
-                <strong>{e.company}</strong>
-                <span>{e.role}</span>
-                <span className="ecb-period">{e.period}</span>
-              </div>
-              {e.current && <span className="exp-current-badge">Current</span>}
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Right: detail panel */}
-      <div className="exp-detail" key={exp.company}>
-        <div className="exp-detail-header">
-          <div>
-            <h3 className="exp-detail-company">{exp.company}</h3>
-            <p className="exp-detail-role">{exp.role} · {exp.location}</p>
-            <span className="exp-detail-product">{exp.product}</span>
-          </div>
-          <span className="timeline-period">{exp.period}</span>
-        </div>
-        <p className="exp-detail-intro">{exp.intro}</p>
-        <div className="exp-highlights">
-          {exp.highlights.map(h => (
-            <div className="exp-highlight-row" key={h.title}>
-              <span className="hl-title">{h.title}</span>
-              <span className="hl-detail">{h.detail}</span>
+    <div className="exp-timeline">
+      {experience.map((e, i) => {
+        const isOpen = openIdx === i;
+        return (
+          <div key={e.company} className={`exp-entry${isOpen ? ' open' : ''}`}>
+            {/* Timeline dot + line */}
+            <div className="exp-track">
+              <div className="exp-dot" />
+              {i < experience.length - 1 && <div className="exp-line" />}
             </div>
-          ))}
-        </div>
-        <div className="tags" style={{ marginTop: 20 }}>
-          {exp.tags.map(t => <span key={t}>{t}</span>)}
-        </div>
-      </div>
+
+            {/* Content */}
+            <div className="exp-content">
+              <button
+                className="exp-header"
+                onClick={() => setOpenIdx(isOpen ? -1 : i)}
+                aria-expanded={isOpen}
+              >
+                <div className="exp-header-left">
+                  <span className="exp-company">{e.company}</span>
+                  {e.current && <span className="exp-current-pill">Current</span>}
+                </div>
+                <div className="exp-header-right">
+                  <span className="exp-role-tag">{e.role}</span>
+                  <span className="exp-period">{e.period}</span>
+                  <ChevronDown className={`exp-chevron${isOpen ? ' rotated' : ''}`} size={16} />
+                </div>
+              </button>
+
+              {isOpen && (
+                <div className="exp-body">
+                  <p className="exp-product">{e.product}</p>
+                  <p className="exp-intro">{e.intro}</p>
+                  <div className="exp-highlights">
+                    {e.highlights.map(h => (
+                      <div className="exp-hl" key={h.title}>
+                        <span className="exp-hl-title">{h.title}</span>
+                        <span className="exp-hl-detail">{h.detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="tags" style={{ marginTop: 18 }}>
+                    {e.tags.map(t => <span key={t}>{t}</span>)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -1282,7 +1252,6 @@ function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed, them
         <nav className="intro-nav" aria-label="Main navigation">
           <button className="intro-nav-brand" onClick={() => scrollTo('home')} aria-label="Go to top">
             <span className="intro-nav-mark" aria-hidden="true">AN</span>
-            <span className="intro-nav-name">ANKITA NANDAL</span>
           </button>
 
           <div className="intro-nav-links desktop-nav">
@@ -1323,7 +1292,6 @@ function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed, them
             {navItems.map(([id, label]) => (
               <button key={id} onClick={() => scrollTo(id)}>{label}</button>
             ))}
-            <button onClick={() => scrollTo('contact')}>Reach Out</button>
           </div>
         )}
 
@@ -1332,9 +1300,13 @@ function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed, them
 
           {/* B. Identity panel */}
           <div className="intro-identity reveal">
-            <span className="intro-hey">Hey, I'm Ankita.</span>
-            <h2 className="intro-name">ANKITA<br />NANDAL</h2>
-            <span className="intro-role-tag">SDET</span>
+            <h2 className="intro-name">Ankita<br />Nandal</h2>
+            <span className="intro-role-title">Software Development Engineer in Test</span>
+            <div className="intro-steps">
+              {['Plan','Build','Test','Ship'].map((s, i, arr) => (
+                <span key={s}>{s}{i < arr.length - 1 && <span className="intro-step-dot"> · </span>}</span>
+              ))}
+            </div>
           </div>
 
           {/* C. Statement + actions panel */}
