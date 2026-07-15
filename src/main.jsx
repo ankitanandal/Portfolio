@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  ArrowRight, BookOpen, BrainCircuit, CheckCircle2, ChevronDown,
-  Code2, Database, Download, ExternalLink, Layers3, Mail, Menu,
-  MessageSquareText, Quote, SearchCheck, ShieldCheck, TestTube2,
-  X, Zap, ArrowUpRight, Cpu, GitBranch, Play,
-  Globe, Table, Cloud, Webhook,
+  BrowserRouter, Route, Routes, useNavigate, useParams, Navigate,
+} from 'react-router-dom';
+import {
+  ArrowLeft, ArrowRight, BookOpen, BrainCircuit, CheckCircle2, ChevronDown,
+  Code2, Database, Download, ExternalLink, GitBranch, Globe,
+  Layers3, Mail, Menu, MessageSquareText, SearchCheck,
+  ShieldCheck, TestTube2, X, Zap, Webhook, Cloud,
 } from 'lucide-react';
 import {
   siPython, siPytest, siSelenium,
@@ -15,23 +17,35 @@ import {
   siArgo, siDocker, siGit, siLinux,
   siJira, siTestrail, siApachejmeter,
   siStripe, siAndroid, siIos,
+  siGithub, siGmail,
 } from 'simple-icons';
+
+function LinkedInIcon({ size = 14, color = '#0A66C2' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true">
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+    </svg>
+  );
+}
 import './styles.css';
 
 /* ─────────────────────────────────────────────────────────────────
-   NAV
+   NAV — section order matches spec
 ───────────────────────────────────────────────────────────────── */
+const NAV_IDS = ['home', 'method', 'skills', 'learning', 'work', 'experience', 'resume', 'contact'];
 const navItems = [
   ['home',       'Home'],
-  ['work',       'Work'],
-  ['experience', 'Experience'],
+  ['method',     'How I Work'],
   ['skills',     'Skills'],
   ['learning',   'Growth'],
+  ['work',       'Work'],
+  ['experience', 'Experience'],
   ['resume',     'Resume'],
+  ['contact',    'Reach Out'],
 ];
 
 /* ─────────────────────────────────────────────────────────────────
-   PROJECTS WITH FULL MODAL DETAIL
+   PROJECTS WITH FULL DETAIL
 ───────────────────────────────────────────────────────────────── */
 const projects = [
   {
@@ -229,8 +243,6 @@ const projects = [
 /* ─────────────────────────────────────────────────────────────────
    SKILLS
 ───────────────────────────────────────────────────────────────── */
-const skillCats = ['All', 'Automation', 'API & Integration', 'Databases', 'Data, Search & ETL', 'Cloud & DevOps', 'Test Management', 'Performance & Mobile', 'Payments'];
-
 const aiQualityDisciplines = [
   { n: 'RAG Evaluation',        desc: 'Relevance, grounding and retrieval accuracy of RAG pipelines' },
   { n: 'Prompt Testing',        desc: 'Intent alignment, output consistency and edge-case inputs' },
@@ -240,54 +252,9 @@ const aiQualityDisciplines = [
   { n: 'Guardrail Testing',     desc: 'Validating safety constraints and refusal behaviour' },
 ];
 
-const skillData = [
-  { name: 'Playwright (Python)', cat: 'Automation',           tag: 'Primary' },
-  { name: 'Python',              cat: 'Automation',           tag: 'Primary' },
-  { name: 'PyTest',              cat: 'Automation'                           },
-  { name: 'Selenium',            cat: 'Automation'                           },
-  { name: 'RainforestQA',        cat: 'Automation'                           },
-  { name: 'Katalon',             cat: 'Automation'                           },
-
-  { name: 'Postman',             cat: 'API & Integration',    tag: 'Primary' },
-  { name: 'REST APIs',           cat: 'API & Integration',    tag: 'Primary' },
-  { name: 'Webhooks',            cat: 'API & Integration'                    },
-  { name: 'OpenAI API',          cat: 'API & Integration'                    },
-
-  { name: 'MySQL',               cat: 'Databases',            tag: 'Primary' },
-  { name: 'PostgreSQL',          cat: 'Databases'                            },
-  { name: 'MongoDB',             cat: 'Databases',            tag: 'Primary' },
-  { name: 'Neo4j',               cat: 'Databases',            tag: 'Primary' },
-  { name: 'phpMyAdmin',          cat: 'Databases'                            },
-
-  { name: 'Airbyte',             cat: 'Data, Search & ETL',   tag: 'Primary' },
-  { name: 'OpenSearch',          cat: 'Data, Search & ETL',   tag: 'Primary' },
-  { name: 'Elasticsearch',       cat: 'Data, Search & ETL'                   },
-  { name: 'AWS Athena',          cat: 'Data, Search & ETL'                   },
-  { name: 'SQL',                 cat: 'Data, Search & ETL',   tag: 'Primary' },
-
-
-  { name: 'AWS EC2 / S3',        cat: 'Cloud & DevOps'                       },
-  { name: 'ArgoCD',              cat: 'Cloud & DevOps'                       },
-  { name: 'Docker',              cat: 'Cloud & DevOps'                       },
-  { name: 'Git',                 cat: 'Cloud & DevOps'                       },
-  { name: 'Linux',               cat: 'Cloud & DevOps'                       },
-
-  { name: 'JIRA',                cat: 'Test Management',      tag: 'Primary' },
-  { name: 'TestRail',            cat: 'Test Management'                      },
-
-  { name: 'JMeter',              cat: 'Performance & Mobile'                 },
-  { name: 'TestFlight',          cat: 'Performance & Mobile'                 },
-  { name: 'Android',             cat: 'Performance & Mobile'                 },
-  { name: 'iOS',                 cat: 'Performance & Mobile'                 },
-
-  { name: 'Stripe',              cat: 'Payments'                             },
-  { name: 'Nexio',               cat: 'Payments'                             },
-];
-
 /* ─────────────────────────────────────────────────────────────────
-   TOOLS GRID (visual, emoji-based, grouped)
+   ICON HELPERS
 ───────────────────────────────────────────────────────────────── */
-/* Renders either a simple-icons SVG or a lucide/custom React component */
 function BrandIcon({ icon, size = 17, color }) {
   if (icon && icon.path) {
     const fill = color || `#${icon.hex}`;
@@ -301,7 +268,6 @@ function BrandIcon({ icon, size = 17, color }) {
   return <Icon size={size} color={color || 'currentColor'} />;
 }
 
-/* ── Custom brand shapes for tools not in simple-icons ── */
 const PlaywrightIcon = ({ size = 17 }) => (
   <svg width={size} height={size} viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M136.444 221.556C123.558 225.213 115.104 231.625 109.535 238.032C114.869 233.364 122.014 229.08 131.652 226.348C141.51 223.554 149.92 223.574 156.869 224.915V219.481C150.941 218.939 144.145 219.371 136.444 221.556ZM108.946 175.876L61.0895 188.484C61.0895 188.484 61.9617 189.716 63.5767 191.36L104.153 180.668C104.153 180.668 103.578 188.077 98.5847 194.705C108.03 187.559 108.946 175.876 108.946 175.876ZM149.005 288.347C81.6582 306.486 46.0272 228.438 35.2396 187.928C30.2556 169.229 28.0799 155.067 27.5 145.928C27.4377 144.979 27.4665 144.179 27.5336 143.446C24.04 143.657 22.3674 145.473 22.7077 150.721C23.2876 159.855 25.4633 174.016 30.4473 192.721C41.2301 233.225 76.8659 311.273 144.213 293.134C158.872 289.185 169.885 281.992 178.152 272.81C170.532 279.692 160.995 285.112 149.005 288.347ZM161.661 128.11V132.903H188.077C187.535 131.206 186.989 129.677 186.447 128.11H161.661Z" fill="#2D4552"/>
@@ -316,9 +282,7 @@ const PlaywrightIcon = ({ size = 17 }) => (
 
 const KatalonIcon = ({ size = 17, color = '#009B72' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M6 4v16" />
-    <path d="M6 12L17 4" />
-    <path d="M6 12l11 8" />
+    <path d="M6 4v16" /><path d="M6 12L17 4" /><path d="M6 12l11 8" />
   </svg>
 );
 
@@ -340,10 +304,8 @@ const AWSAthenaIcon = ({ size = 17, color = '#8C4FFF' }) => (
 
 const TestFlightIcon = ({ size = 17, color = '#1D6FF2' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true">
-    <circle cx="12" cy="12" r="2" />
-    <path d="M12 2c-1.1 0-2 .9-2 2s.9 2 2 2V2z" />
-    <path d="M22 12c0-1.1-.9-2-2-2s-2 .9-2 2h4z" />
-    <path d="M12 22c1.1 0 2-.9 2-2s-.9-2-2-2v4z" />
+    <circle cx="12" cy="12" r="2" /><path d="M12 2c-1.1 0-2 .9-2 2s.9 2 2 2V2z" />
+    <path d="M22 12c0-1.1-.9-2-2-2s-2 .9-2 2h4z" /><path d="M12 22c1.1 0 2-.9 2-2s-.9-2-2-2v4z" />
     <path d="M2 12c0 1.1.9 2 2 2s2-.9 2-2H2z" />
     <path d="M5.64 5.64c-.78.78-.78 2.05 0 2.83s2.05.78 2.83 0L5.64 5.64z" />
     <path d="M18.36 5.64c-.78-.78-2.05-.78-2.83 0s-.78 2.05 0 2.83l2.83-2.83z" />
@@ -364,70 +326,73 @@ const RainforestIcon = ({ size = 17, color = '#16A34A' }) => (
   </svg>
 );
 
+/* ─────────────────────────────────────────────────────────────────
+   TOOL GROUPS
+───────────────────────────────────────────────────────────────── */
 const toolGroups = [
-  { label: 'Automation',             color: '#c27455', tools: [
-    { icon: PlaywrightIcon, n: 'Playwright'  },
-    { icon: siPython,       n: 'Python'      },
-    { icon: siPytest,       n: 'PyTest'      },
-    { icon: siSelenium,     n: 'Selenium'    },
-    { icon: RainforestIcon, n: 'RainforestQA'},
-    { icon: KatalonIcon,    n: 'Katalon'     },
+  { label: 'Automation',               color: '#c27455', tools: [
+    { icon: PlaywrightIcon, n: 'Playwright'   },
+    { icon: siPython,       n: 'Python'       },
+    { icon: siPytest,       n: 'PyTest'       },
+    { icon: siSelenium,     n: 'Selenium'     },
+    { icon: RainforestIcon, n: 'RainforestQA' },
+    { icon: KatalonIcon,    n: 'Katalon'      },
   ]},
-  { label: 'API & Integration',      color: '#a85a3a', tools: [
-    { icon: siPostman,      n: 'Postman'                  },
-    { icon: Globe,          n: 'REST APIs',  c: '#6B7280' },
-    { icon: Webhook,        n: 'Webhooks',   c: '#6B7280' },
-    { icon: OpenAIIcon,     n: 'OpenAI API'               },
+  { label: 'API & Integration',        color: '#a85a3a', tools: [
+    { icon: siPostman,    n: 'Postman'                 },
+    { icon: Globe,        n: 'REST APIs', c: '#6B7280' },
+    { icon: Webhook,      n: 'Webhooks',  c: '#6B7280' },
+    { icon: OpenAIIcon,   n: 'OpenAI API'              },
   ]},
-  { label: 'Databases',              color: '#8b6f5e', tools: [
-    { icon: siMysql,        n: 'MySQL'       },
-    { icon: siPostgresql,   n: 'PostgreSQL'  },
-    { icon: siMongodb,      n: 'MongoDB'     },
-    { icon: siNeo4j,        n: 'Neo4j'       },
-    { icon: siPhpmyadmin,   n: 'phpMyAdmin'  },
+  { label: 'Databases',                color: '#8b6f5e', tools: [
+    { icon: siMysql,      n: 'MySQL'      },
+    { icon: siPostgresql, n: 'PostgreSQL' },
+    { icon: siMongodb,    n: 'MongoDB'    },
+    { icon: siNeo4j,      n: 'Neo4j'      },
+    { icon: siPhpmyadmin, n: 'phpMyAdmin' },
   ]},
-  { label: 'Data, Search & ETL',     color: '#4a6abf', tools: [
-    { icon: siAirbyte,        n: 'Airbyte'                  },
-    { icon: siOpensearch,     n: 'OpenSearch'                },
-    { icon: siElasticsearch,  n: 'Elasticsearch'             },
-    { icon: AWSAthenaIcon,    n: 'AWS Athena'                },
-    { icon: Table,            n: 'SQL',          c: '#6B7280'},
+  { label: 'Data, Search & ETL',       color: '#4a6abf', tools: [
+    { icon: siAirbyte,       n: 'Airbyte'                   },
+    { icon: siOpensearch,    n: 'OpenSearch'                 },
+    { icon: siElasticsearch, n: 'Elasticsearch'              },
+    { icon: AWSAthenaIcon,   n: 'AWS Athena'                 },
+    { icon: Globe,           n: 'SQL',         c: '#6B7280'  },
   ]},
-  { label: 'Cloud & DevOps',         color: '#555555', tools: [
-    { icon: Cloud,          n: 'AWS',        c: '#FF9900' },
-    { icon: siArgo,         n: 'ArgoCD'                  },
-    { icon: siDocker,       n: 'Docker'                  },
-    { icon: siGit,          n: 'Git'                     },
-    { icon: siLinux,        n: 'Linux'                   },
+  { label: 'Cloud & DevOps',           color: '#555555', tools: [
+    { icon: Cloud,    n: 'AWS',    c: '#FF9900' },
+    { icon: siArgo,   n: 'ArgoCD'              },
+    { icon: siDocker, n: 'Docker'              },
+    { icon: siGit,    n: 'Git'                 },
+    { icon: siLinux,  n: 'Linux'               },
   ]},
   { label: 'Test & Defect Management', color: '#c9a96e', tools: [
-    { icon: siJira,         n: 'JIRA'        },
-    { icon: siTestrail,     n: 'TestRail'    },
+    { icon: siJira,     n: 'JIRA'     },
+    { icon: siTestrail, n: 'TestRail' },
   ]},
-  { label: 'Performance & Mobile',   color: '#6b7c93', tools: [
+  { label: 'Performance & Mobile',     color: '#6b7c93', tools: [
     { icon: siApachejmeter, n: 'JMeter'      },
     { icon: TestFlightIcon, n: 'TestFlight'  },
     { icon: siAndroid,      n: 'Android'     },
     { icon: siIos,          n: 'iOS'         },
   ]},
-  { label: 'Payments',               color: '#7c5cbf', tools: [
-    { icon: siStripe,       n: 'Stripe'      },
-    { icon: NexioIcon,      n: 'Nexio'       },
+  { label: 'Payments',                 color: '#7c5cbf', tools: [
+    { icon: siStripe, n: 'Stripe' },
+    { icon: NexioIcon, n: 'Nexio' },
   ]},
 ];
 
 /* ─────────────────────────────────────────────────────────────────
-   CAPABILITIES (abstract skill areas)
+   CAPABILITIES
 ───────────────────────────────────────────────────────────────── */
 const capabilities = [
-  { icon: Code2,          label: 'Test Automation',      desc: 'Playwright, PyTest, Python — scalable, fixture-driven, product-aware frameworks.' },
-  { icon: Layers3,        label: 'API Testing',          desc: 'Request/response, auth flows, integrations, and API-to-database consistency.' },
-  { icon: Database,       label: 'Database Testing',     desc: 'SQL, MongoDB, Neo4j — validating schema, state, and cross-system consistency.' },
-  { icon: GitBranch,      label: 'Data & ETL Validation',desc: 'Pipeline-level testing: ingestion accuracy, transformation correctness, sync integrity.' },
-  { icon: BrainCircuit,   label: 'AI / LLM Testing',     desc: 'RAG validation, prompt benchmarking, MCP agent behavior, hallucination detection.' },
-  { icon: SearchCheck,    label: 'Test Strategy',        desc: 'Risk-based coverage design, flow mapping, and gap analysis before writing tests.' },
-  { icon: MessageSquareText,label:'Release Ownership',   desc: 'Communicating quality risk, release readiness, and defect priority to teams.' },
-  { icon: Zap,            label: 'Cross-Platform QA',    desc: 'Web, Android, iOS — consistent validation across environments and form factors.' },
+  { icon: Code2,             label: 'Test Automation',       desc: 'Playwright, PyTest, Python — scalable, fixture-driven, product-aware frameworks.' },
+  { icon: Layers3,           label: 'API Testing',           desc: 'Request/response, auth flows, integrations, and API-to-database consistency.' },
+  { icon: Database,          label: 'Database Testing',      desc: 'SQL, MongoDB, Neo4j — validating schema, state, and cross-system consistency.' },
+  { icon: GitBranch,         label: 'Data & ETL Validation', desc: 'Pipeline-level testing: ingestion accuracy, transformation correctness, sync integrity.' },
+  { icon: BrainCircuit,      label: 'AI / LLM Testing',      desc: 'RAG validation, prompt benchmarking, MCP agent behavior, hallucination detection.' },
+  { icon: SearchCheck,       label: 'Test Strategy',         desc: 'Risk-based coverage design, flow mapping, and gap analysis before writing tests.' },
+  { icon: MessageSquareText, label: 'Release Ownership',     desc: 'Communicating quality risk, release readiness, and defect priority to teams.' },
+  { icon: Zap,               label: 'Cross-Platform QA',     desc: 'Web, Android, iOS — consistent validation across environments and form factors.' },
 ];
 
 /* ─────────────────────────────────────────────────────────────────
@@ -443,12 +408,12 @@ const experience = [
     product: 'AI-powered enterprise operations platform',
     intro: 'Owning end-to-end quality across a multi-layered AI platform — conversational UI, RAG knowledge retrieval, MCP-integrated agents, ETL pipelines, connector ingestion, analytics, and release validation.',
     highlights: [
-      { title: 'AI & RAG Testing', detail: 'Validated LLM prompt quality, RAG retrieval accuracy, context grounding, and agent tool-call behavior for non-deterministic AI components.' },
-      { title: 'ETL & Data Pipelines', detail: 'Field-level validation across ingestion, transformation, and sync — catching silent data corruption before it reached AI consumption.' },
-      { title: 'Cross-service Validation', detail: 'Source-to-target consistency checks across MongoDB, Neo4j, OpenSearch, and Elasticsearch after every pipeline run.' },
-      { title: 'API Depth', detail: 'Comprehensive Postman collections covering auth, CRUD, integrations, error handling, and API-to-DB consistency.' },
-      { title: 'Release Support', detail: 'ArgoCD log analysis, AWS EC2/S3 environment checks, and Python scripts to support CI/CD release confidence.' },
-      { title: 'QA Agent Build', detail: 'Built an AI-based QA agent with MCP integrations to automate PR test case generation — reducing manual effort by 50%.' },
+      { title: 'AI & RAG Testing',        detail: 'Validated LLM prompt quality, RAG retrieval accuracy, context grounding, and agent tool-call behavior for non-deterministic AI components.' },
+      { title: 'ETL & Data Pipelines',    detail: 'Field-level validation across ingestion, transformation, and sync — catching silent data corruption before it reached AI consumption.' },
+      { title: 'Cross-service Validation',detail: 'Source-to-target consistency checks across MongoDB, Neo4j, OpenSearch, and Elasticsearch after every pipeline run.' },
+      { title: 'API Depth',              detail: 'Comprehensive Postman collections covering auth, CRUD, integrations, error handling, and API-to-DB consistency.' },
+      { title: 'Release Support',        detail: 'ArgoCD log analysis, AWS EC2/S3 environment checks, and Python scripts to support CI/CD release confidence.' },
+      { title: 'QA Agent Build',         detail: 'Built an AI-based QA agent with MCP integrations to automate PR test case generation — reducing manual effort by 50%.' },
     ],
     tags: ['AI Testing', 'RAG', 'MCP', 'ETL', 'MongoDB', 'Neo4j', 'ArgoCD', 'Python'],
   },
@@ -460,11 +425,11 @@ const experience = [
     product: 'AI-based social media automation platform + SaaS subscription product',
     intro: 'Tested complex products across web, Android, and iOS — covering AI content generation, API validation, payment gateway flows, subscription management, and database verification.',
     highlights: [
-      { title: 'Payment Testing', detail: 'Stripe subscription lifecycle and Nexio one-time payment flows — validated UI, API, webhook events, and database billing state simultaneously.' },
-      { title: 'API & Database', detail: 'REST API testing with backend DB cross-checks via phpMyAdmin — isolating defects beyond what the UI revealed.' },
-      { title: 'Cross-platform', detail: 'Consistent functional and regression coverage across web, Android, and iOS for the same feature set.' },
-      { title: 'AWS Log Monitoring', detail: 'Tracked real-time errors on AWS EC2 instances and validated S3 media storage workflows for production stability.' },
-      { title: 'AI Content QA', detail: 'Validated AI-generated social content, scheduling logic, and NLP outputs against user requirements and platform standards.' },
+      { title: 'Payment Testing',   detail: 'Stripe subscription lifecycle and Nexio one-time payment flows — validated UI, API, webhook events, and database billing state simultaneously.' },
+      { title: 'API & Database',    detail: 'REST API testing with backend DB cross-checks via phpMyAdmin — isolating defects beyond what the UI revealed.' },
+      { title: 'Cross-platform',    detail: 'Consistent functional and regression coverage across web, Android, and iOS for the same feature set.' },
+      { title: 'AWS Log Monitoring',detail: 'Tracked real-time errors on AWS EC2 instances and validated S3 media storage workflows for production stability.' },
+      { title: 'AI Content QA',     detail: 'Validated AI-generated social content, scheduling logic, and NLP outputs against user requirements and platform standards.' },
     ],
     tags: ['Stripe', 'Nexio', 'REST API', 'MySQL', 'AWS', 'Android', 'iOS', 'JIRA'],
   },
@@ -476,9 +441,9 @@ const experience = [
     product: 'Cross-platform fitness and booking application',
     intro: 'Built the foundation of my QA practice — test case design, regression testing, defect lifecycle management, and first exposure to payment validation and test automation tooling.',
     highlights: [
-      { title: 'Test Case Design', detail: 'Designed structured test cases in TestRail covering functional, regression, and E2E scenarios across web, Android, and iOS.' },
-      { title: 'Nexio Payments', detail: 'Validated one-time payment flows, success/failure states, and backend billing accuracy for the booking system.' },
-      { title: 'Automation Start', detail: 'First automation experience using RainforestQA and Katalon — reducing manual regression effort across release cycles.' },
+      { title: 'Test Case Design',  detail: 'Designed structured test cases in TestRail covering functional, regression, and E2E scenarios across web, Android, and iOS.' },
+      { title: 'Nexio Payments',    detail: 'Validated one-time payment flows, success/failure states, and backend billing accuracy for the booking system.' },
+      { title: 'Automation Start',  detail: 'First automation experience using RainforestQA and Katalon — reducing manual regression effort across release cycles.' },
       { title: 'Defect Management', detail: 'Managed full defect lifecycle in JIRA — reporting, prioritization, developer collaboration, and resolution verification.' },
     ],
     tags: ['TestRail', 'RainforestQA', 'Katalon', 'Nexio', 'JIRA', 'Manual Testing'],
@@ -489,11 +454,11 @@ const experience = [
    HOW I WORK
 ───────────────────────────────────────────────────────────────── */
 const methodSteps = [
-  { n: '01', icon: SearchCheck,      title: 'Understand the flow',    body: 'Before writing a single test, I map the system. User journey, API calls, data movement, dependencies. I need to know what normal looks like before I can find what breaks.' },
-  { n: '02', icon: Layers3,          title: 'Analyze risk',           body: 'I identify what is most likely to fail, what would hurt most if it did, and what has been missed before. Coverage is about risk, not checkbox counts.' },
-  { n: '03', icon: Database,         title: 'Validate deeply',        body: "I don't stop at the UI. I check the API response, the database state, the log entry, the downstream system. A bug confirmed at three layers is a bug that stays fixed." },
-  { n: '04', icon: MessageSquareText,title: 'Communicate clearly',    body: 'I turn findings into decisions — not just lists. Severity context, business impact, reproduction confidence, and what needs to happen before release.' },
-  { n: '05', icon: Zap,              title: 'Improve continuously',   body: "After every release I close the gap: what we missed, why, and how we catch it next time. Quality isn't a phase. It's a feedback loop." },
+  { n: '01', icon: SearchCheck,       title: 'Understand the flow',  body: 'Before writing a single test, I map the system. User journey, API calls, data movement, dependencies. I need to know what normal looks like before I can find what breaks.' },
+  { n: '02', icon: Layers3,           title: 'Analyze risk',         body: 'I identify what is most likely to fail, what would hurt most if it did, and what has been missed before. Coverage is about risk, not checkbox counts.' },
+  { n: '03', icon: Database,          title: 'Validate deeply',      body: "I don't stop at the UI. I check the API response, the database state, the log entry, the downstream system. A bug confirmed at three layers is a bug that stays fixed." },
+  { n: '04', icon: MessageSquareText, title: 'Communicate clearly',  body: 'I turn findings into decisions — not just lists. Severity context, business impact, reproduction confidence, and what needs to happen before release.' },
+  { n: '05', icon: Zap,              title: 'Improve continuously', body: "After every release I close the gap: what we missed, why, and how we catch it next time. Quality isn't a phase. It's a feedback loop." },
 ];
 
 /* ─────────────────────────────────────────────────────────────────
@@ -566,32 +531,11 @@ function useTypewriter(words, speed = 78, pause = 2400) {
   return display;
 }
 
-function useCountUp(target, duration = 1600) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  useEffect(() => {
-    const el = ref.current; if (!el) return;
-    const io = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-      io.disconnect();
-      const steps = 48; const inc = target / steps; let cur = 0;
-      const t = setInterval(() => {
-        cur = Math.min(cur + inc, target);
-        setCount(Math.round(cur * 10) / 10);
-        if (cur >= target) clearInterval(t);
-      }, duration / steps);
-    }, { threshold: 0.5 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [target, duration]);
-  return { count, ref };
-}
-
 function useScrollReveal() {
   useEffect(() => {
     const io = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-      { threshold: 0.09, rootMargin: '0px 0px -36px 0px' }
+      { threshold: 0.07, rootMargin: '0px 0px -30px 0px' }
     );
     document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => io.observe(el));
     return () => io.disconnect();
@@ -608,236 +552,1026 @@ function useScrollProgress() {
   return pct;
 }
 
+function useActiveSection(ids) {
+  const [active, setActive] = useState(ids[0] || 'home');
+  useEffect(() => {
+    const update = () => {
+      const offset = window.scrollY + 160;
+      let current = ids[0];
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= offset) current = id;
+      }
+      setActive(current);
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
+  }, [ids]);
+  return active;
+}
+
+function useIntroPast(ref) {
+  const [past, setPast] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setPast(!entry.isIntersecting),
+      { threshold: 0, rootMargin: '0px' }
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [ref]);
+  return past;
+}
+
 /* ─────────────────────────────────────────────────────────────────
-   COMPONENTS
+   SYSTEM MAP — hero interactive visual
 ───────────────────────────────────────────────────────────────── */
-function StatCard({ target, suffix = '', label }) {
-  const { count, ref } = useCountUp(target);
+const SM_BASE = 360;
+const SM_CX   = 180;
+const SM_CY   = 180;
+const SM_R    = 118;
+
+const systemNodes = [
+  { id: 'auto', Icon: Code2,        label: 'Automation', angle: -90,  color: '#c27455', desc: 'Playwright, PyTest, Python — scalable, fixture-driven, product-aware frameworks.' },
+  { id: 'api',  Icon: Webhook,      label: 'APIs',       angle: -30,  color: '#a85a3a', desc: 'Request/response, auth flows, integrations, and API-to-database consistency.' },
+  { id: 'db',   Icon: Database,     label: 'Databases',  angle: 30,   color: '#8b6f5e', desc: 'SQL, MongoDB, Neo4j — validating schema, state, and cross-system consistency.' },
+  { id: 'etl',  Icon: GitBranch,    label: 'ETL',        angle: 90,   color: '#4a6abf', desc: 'Pipeline-level testing: ingestion accuracy, transformation correctness, sync integrity.' },
+  { id: 'ai',   Icon: BrainCircuit, label: 'AI / LLM',   angle: 150,  color: '#3a8a56', desc: 'RAG validation, prompt benchmarking, MCP agent behavior, hallucination detection.' },
+  { id: 'ui',   Icon: Globe,        label: 'UI',         angle: -150, color: '#c9a96e', desc: 'Web, Android, iOS — consistent validation across environments and form factors.' },
+];
+
+function getNodePos(angle) {
+  return {
+    x: SM_CX + SM_R * Math.cos(angle * Math.PI / 180),
+    y: SM_CY + SM_R * Math.sin(angle * Math.PI / 180),
+  };
+}
+
+function SystemMap() {
+  const [active, setActive] = useState(null);
+  const activeNode = systemNodes.find(n => n.id === active);
+
   return (
-    <div className="bento metric" ref={ref}>
-      <strong>{count}{suffix}</strong>
-      <span>{label}</span>
+    <div className="system-map" role="region" aria-label="Interactive testing layer map">
+      <div className="sm-wrap">
+        {/* Background + connection lines */}
+        <svg
+          className="sm-svg"
+          viewBox={`0 0 ${SM_BASE} ${SM_BASE}`}
+          aria-hidden="true"
+        >
+          {/* Subtle grid dots */}
+          {Array.from({ length: 7 }, (_, ri) =>
+            Array.from({ length: 7 }, (_, ci) => (
+              <circle key={`${ri}-${ci}`} cx={ri * 55 + 17} cy={ci * 55 + 17} r={1.2} fill="var(--beige3)" opacity="0.7" />
+            ))
+          )}
+          {/* Center pulse ring */}
+          <circle cx={SM_CX} cy={SM_CY} r={52} fill="none" stroke="var(--terra)" strokeWidth="0.5" opacity="0.25" strokeDasharray="6 5" className="sm-pulse-ring" />
+          {/* Connection lines */}
+          {systemNodes.map(n => {
+            const pos = getNodePos(n.angle);
+            const isAct = active === n.id;
+            return (
+              <line
+                key={`ln-${n.id}`}
+                x1={SM_CX} y1={SM_CY}
+                x2={pos.x} y2={pos.y}
+                stroke={isAct ? n.color : 'var(--beige3)'}
+                strokeWidth={isAct ? 2 : 1.5}
+                strokeDasharray={isAct ? '0' : '5 4'}
+                style={{ transition: 'stroke .28s, stroke-width .28s' }}
+              />
+            );
+          })}
+        </svg>
+
+        {/* Center node */}
+        <div
+          className="sm-center"
+          style={{ left: `${(SM_CX / SM_BASE) * 100}%`, top: `${(SM_CY / SM_BASE) * 100}%` }}
+        >
+          <ShieldCheck size={20} />
+          <span>SDET</span>
+        </div>
+
+        {/* Outer layer nodes */}
+        {systemNodes.map(n => {
+          const pos = getNodePos(n.angle);
+          const isAct = active === n.id;
+          const { Icon } = n;
+          return (
+            <button
+              key={n.id}
+              className={`sm-node${isAct ? ' active' : ''}`}
+              style={{
+                left: `${(pos.x / SM_BASE) * 100}%`,
+                top: `${(pos.y / SM_BASE) * 100}%`,
+                '--nc': n.color,
+              }}
+              onMouseEnter={() => setActive(n.id)}
+              onMouseLeave={() => setActive(null)}
+              onClick={() => setActive(active === n.id ? null : n.id)}
+              aria-label={`${n.label} — hover to read description`}
+              aria-pressed={isAct}
+            >
+              <Icon size={17} />
+              <span>{n.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Description */}
+      <div className="sm-info" aria-live="polite">
+        {activeNode ? (
+          <p className="sm-desc" style={{ color: activeNode.color }}>
+            <strong>{activeNode.label}:</strong> {activeNode.desc}
+          </p>
+        ) : (
+          <p className="sm-hint">Hover a testing layer to explore</p>
+        )}
+      </div>
     </div>
   );
 }
 
-function ProjectModal({ project, onClose }) {
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    const esc = e => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', esc);
-    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', esc); };
-  }, [onClose]);
+/* ─────────────────────────────────────────────────────────────────
+   METHOD ACCORDION
+───────────────────────────────────────────────────────────────── */
+function MethodAccordion() {
+  const [openStep, setOpenStep] = useState(0);
 
-  const m = project.modal;
   return (
-    <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal-panel" role="dialog" aria-modal="true">
-        <div className="modal-head">
-          <div>
-            <small>{project.eyebrow}</small>
-            <h2>{project.title}</h2>
+    <div className="method-accordion">
+      <div className="method-steps-row" role="tablist">
+        {methodSteps.map((s, i) => {
+          const Icon = s.icon;
+          const isOpen = openStep === i;
+          return (
+            <button
+              key={s.n}
+              className={`method-step-btn${isOpen ? ' active' : ''}`}
+              onClick={() => setOpenStep(isOpen ? null : i)}
+              role="tab"
+              aria-selected={isOpen}
+              aria-controls={`method-panel-${i}`}
+              id={`method-tab-${i}`}
+            >
+              <span className="msb-num">{s.n}</span>
+              <div className="msb-icon"><Icon size={20} /></div>
+              <span className="msb-title">{s.title}</span>
+              <ChevronDown className={`msb-chevron${isOpen ? ' rotated' : ''}`} size={15} />
+            </button>
+          );
+        })}
+      </div>
+
+      {openStep !== null && (
+        <div
+          className="method-step-panel"
+          role="tabpanel"
+          id={`method-panel-${openStep}`}
+          aria-labelledby={`method-tab-${openStep}`}
+        >
+          <div className="msp-inner">
+            <div className="msp-num">{methodSteps[openStep].n}</div>
+            <div>
+              <h4>{methodSteps[openStep].title}</h4>
+              <p>{methodSteps[openStep].body}</p>
+            </div>
           </div>
-          <button className="modal-close" onClick={onClose} aria-label="Close"><X size={20} /></button>
         </div>
-        <div className="modal-body">
-          <Section label="Context">{m.context}</Section>
-          <Section label="What I Did">{m.whatIDid}</Section>
-          <Section label="Responsibilities">
-            <ul className="modal-list">{m.responsibilities.map(r => <li key={r}><CheckCircle2 size={14} /><span>{r}</span></li>)}</ul>
-          </Section>
-          <Section label="Challenges">
-            <ul className="modal-list">{m.challenges.map(c => <li key={c}><span className="modal-dash">—</span><span>{c}</span></li>)}</ul>
-          </Section>
-          <Section label="Testing Approach">{m.approach}</Section>
-          <Section label="Tools Used">
-            <div className="modal-tags">{m.tools.map(t => <span key={t}>{t}</span>)}</div>
-          </Section>
-          <Section label="Achievements">
-            <ul className="modal-list">{m.achievements.map(a => <li key={a}><CheckCircle2 size={14} /><span>{a}</span></li>)}</ul>
-          </Section>
-          <Section label="Impact">{m.impact}</Section>
-          <Section label="Learnings">{m.learnings}</Section>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   SKILLS SECTION — collapsible category accordion with filter
+───────────────────────────────────────────────────────────────── */
+const SKILL_FILTERS = [
+  { label: 'All',        groups: null },
+  { label: 'Testing',    groups: ['Automation', 'API & Integration', 'Test & Defect Management', 'Performance & Mobile'] },
+  { label: 'Automation', groups: ['Automation'] },
+  { label: 'Data',       groups: ['Data, Search & ETL', 'Databases'] },
+  { label: 'AI',         groups: ['API & Integration', 'Automation', 'Data, Search & ETL'] },
+  { label: 'Cloud',      groups: ['Cloud & DevOps'] },
+  { label: 'Management', groups: ['Test & Defect Management'] },
+];
+
+function SkillsSection() {
+  const [filter, setFilter] = useState('All');
+  const [openCats, setOpenCats] = useState(new Set());
+
+  const toggleCat = useCallback(label => {
+    setOpenCats(prev => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label); else next.add(label);
+      return next;
+    });
+  }, []);
+
+  const activeFilter = SKILL_FILTERS.find(f => f.label === filter);
+  const visibleGroups = activeFilter.groups
+    ? toolGroups.filter(g => activeFilter.groups.includes(g.label))
+    : toolGroups;
+
+  return (
+    <div className="skills-wrap">
+      {/* Capabilities */}
+      <div className="section-heading reveal">
+        <div>
+          <div className="eyebrow">TOOLS, TECHNOLOGIES & PLATFORMS</div>
+          <h2>Where I operate and what I use</h2>
+        </div>
+        <p>Capability areas, filterable skills, and the full tech stack — all in one place.</p>
+      </div>
+
+      <div className="capabilities-grid reveal">
+        {capabilities.map(c => {
+          const Icon = c.icon;
+          return (
+            <div className="cap-card" key={c.label}>
+              <Icon size={20} />
+              <div>
+                <strong>{c.label}</strong>
+                <p>{c.desc}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* AI Quality disciplines */}
+      <div className="ai-quality-band reveal">
+        <div className="ai-quality-head">
+          <BrainCircuit size={18} />
+          <div>
+            <span className="aqb-label">AI Quality Disciplines</span>
+            <span className="aqb-note">Evaluated through behaviour and contracts — not pass/fail assertions</span>
+          </div>
+        </div>
+        <div className="ai-quality-grid">
+          {aiQualityDisciplines.map(d => (
+            <div className="ai-quality-card" key={d.n}>
+              <span className="aqc-dot" />
+              <div>
+                <strong>{d.n}</strong>
+                <p>{d.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bridge */}
+      <div className="stack-bridge reveal">
+        <span className="bridge-line" /><span className="bridge-label">tools & platforms behind the work</span><span className="bridge-line" />
+      </div>
+
+      {/* Filter */}
+      <div className="filter-row reveal">
+        {SKILL_FILTERS.map(f => (
+          <button
+            key={f.label}
+            className={`filter-btn${filter === f.label ? ' active' : ''}`}
+            onClick={() => setFilter(f.label)}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Accordion */}
+      <div className="acc-cats">
+        {visibleGroups.map(g => {
+          const isOpen = openCats.has(g.label);
+          return (
+            <div key={g.label} className={`acc-cat${isOpen ? ' open' : ''}`}>
+              <button
+                className="acc-cat-btn"
+                onClick={() => toggleCat(g.label)}
+                aria-expanded={isOpen}
+                style={{ '--gc': g.color }}
+              >
+                <div className="acc-cat-left">
+                  <span className="acc-cat-bar" style={{ background: g.color }} />
+                  <span className="acc-cat-name">{g.label}</span>
+                  <span className="acc-cat-count">{g.tools.length} tools</span>
+                </div>
+                <ChevronDown className={`acc-chevron${isOpen ? ' rotated' : ''}`} size={17} />
+              </button>
+              {isOpen && (
+                <div className="acc-cat-body">
+                  <div className="tool-row">
+                    {g.tools.map(t => (
+                      <div className="tool-chip" key={t.n} style={{ '--gc': g.color }}>
+                        <span className="tool-brand-icon"><BrandIcon icon={t.icon} size={16} color={t.c} /></span>
+                        <span>{t.n}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   CASE STUDY ILLUSTRATION — abstract inline SVG per project
+───────────────────────────────────────────────────────────────── */
+function CaseStudyIllustration({ id, color }) {
+  const bg = `${color}18`;
+  const stroke = color;
+
+  const visuals = {
+    'ai-platform': (
+      <>
+        <circle cx="200" cy="110" r="32" fill={bg} stroke={stroke} strokeWidth="1.5" />
+        <text x="200" y="106" textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="800">AI</text>
+        <text x="200" y="120" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope">Engine</text>
+        {[['RAG', 80, 60], ['ETL', 80, 160], ['MCP', 320, 60], ['DB', 320, 160]].map(([lbl, x, y]) => (
+          <g key={lbl}>
+            <circle cx={x} cy={y} r={22} fill={bg} stroke={stroke} strokeWidth="1" />
+            <text x={x} y={y + 4} textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">{lbl}</text>
+            <line x1={x > 200 ? x - 22 : x + 22} y1={y} x2={x > 200 ? 232 : 168} y2={110} stroke={stroke} strokeWidth="1" strokeDasharray="4 3" />
+          </g>
+        ))}
+      </>
+    ),
+    'etl-data': (
+      <>
+        {[['Source', 60], ['Transform', 190], ['Store', 320]].map(([lbl, x], i) => (
+          <g key={lbl}>
+            <rect x={x - 36} y="90" width="72" height="40" rx="8" fill={bg} stroke={stroke} strokeWidth="1.2" />
+            <text x={x} y="114" textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">{lbl}</text>
+            {i < 2 && <path d={`M${x+36} 110 L${x+56} 110`} stroke={stroke} strokeWidth="1.5" markerEnd="url(#arr)" />}
+          </g>
+        ))}
+        <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill={stroke} /></marker></defs>
+        <text x="200" y="60" textAnchor="middle" fill={stroke} fontSize="10" fontFamily="Manrope" fontWeight="700" opacity="0.6">Pipeline QA</text>
+        {[60, 190, 320].map(x => (
+          <g key={x}>
+            <circle cx={x} cy="160" r={4} fill={stroke} opacity="0.5" />
+            <line x1={x} y1="130" x2={x} y2="155" stroke={stroke} strokeWidth="1" strokeDasharray="3 3" />
+          </g>
+        ))}
+      </>
+    ),
+    'payments': (
+      <>
+        <rect x="120" y="75" width="160" height="90" rx="12" fill={bg} stroke={stroke} strokeWidth="1.5" />
+        <rect x="120" y="95" width="160" height="18" fill={stroke} opacity="0.15" />
+        <text x="200" y="108" textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">PAYMENT GATEWAY</text>
+        <text x="200" y="140" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope">Stripe · Nexio · Webhooks</text>
+        <circle cx="90" cy="110" r="20" fill={bg} stroke={stroke} strokeWidth="1" />
+        <text x="90" y="114" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope" fontWeight="700">UI</text>
+        <circle cx="310" cy="110" r="20" fill={bg} stroke={stroke} strokeWidth="1" />
+        <text x="310" y="114" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope" fontWeight="700">DB</text>
+        <line x1="110" y1="110" x2="120" y2="110" stroke={stroke} strokeWidth="1.5" />
+        <line x1="280" y1="110" x2="290" y2="110" stroke={stroke} strokeWidth="1.5" />
+      </>
+    ),
+    'social-ai': (
+      <>
+        <circle cx="200" cy="100" r="28" fill={bg} stroke={stroke} strokeWidth="1.5" />
+        <text x="200" y="97" textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="800">AI</text>
+        <text x="200" y="111" textAnchor="middle" fill={stroke} fontSize="7" fontFamily="Manrope">Content</text>
+        {[['LI', 80, 75], ['IG', 80, 135], ['TW', 320, 75], ['DB', 320, 135]].map(([lbl, x, y]) => (
+          <g key={lbl}>
+            <rect x={x - 18} y={y - 16} width="36" height="32" rx="7" fill={bg} stroke={stroke} strokeWidth="1" />
+            <text x={x} y={y + 4} textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">{lbl}</text>
+            <line x1={x > 200 ? x - 18 : x + 18} y1={y} x2={x > 200 ? 228 : 172} y2={100} stroke={stroke} strokeWidth="1" strokeDasharray="4 3" />
+          </g>
+        ))}
+      </>
+    ),
+    'fitness-app': (
+      <>
+        {[['Web', 90, 110, 36], ['Android', 200, 110, 32], ['iOS', 310, 110, 32]].map(([lbl, x, y, r]) => (
+          <g key={lbl}>
+            <circle cx={x} cy={y} r={r} fill={bg} stroke={stroke} strokeWidth="1.2" />
+            <text x={x} y={y + 4} textAnchor="middle" fill={stroke} fontSize="9" fontFamily="Manrope" fontWeight="700">{lbl}</text>
+          </g>
+        ))}
+        <line x1="126" y1="110" x2="168" y2="110" stroke={stroke} strokeWidth="1" strokeDasharray="4 3" />
+        <line x1="232" y1="110" x2="278" y2="110" stroke={stroke} strokeWidth="1" strokeDasharray="4 3" />
+        <text x="200" y="60" textAnchor="middle" fill={stroke} fontSize="10" fontFamily="Manrope" fontWeight="700" opacity="0.6">Cross-Platform QA</text>
+        <text x="200" y="175" textAnchor="middle" fill={stroke} fontSize="8" fontFamily="Manrope" opacity="0.6">TestRail · JIRA · Nexio</text>
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      viewBox="0 0 400 220"
+      className="cs-illus"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="400" height="220" fill={bg} rx="2" />
+      {visuals[id] ?? <rect x="0" y="0" width="400" height="220" fill={bg} />}
+    </svg>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   CASE STUDY SECTION — split layout
+───────────────────────────────────────────────────────────────── */
+function CaseStudySection() {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const navigate = useNavigate();
+  const p = projects[activeIdx];
+
+  return (
+    <div className="cs-split">
+      {/* Left: preview */}
+      <div className="cs-preview">
+        <div className="cs-preview-card reveal-left">
+          <div className="cs-illus-wrap">
+            <CaseStudyIllustration id={p.id} color={p.accentColor} />
+          </div>
+          <div className="cs-preview-body">
+            <small className="cs-eyebrow" style={{ color: p.accentColor }}>{p.eyebrow}</small>
+            <h3 className="cs-preview-title">{p.title}</h3>
+            <p className="cs-preview-summary">{p.summary}</p>
+            <div className="tags">
+              {p.tags.map(t => <span key={t}>{t}</span>)}
+            </div>
+            <button
+              className="btn cs-cta"
+              onClick={() => navigate(`/case-studies/${p.id}`)}
+              style={{ '--accent': p.accentColor }}
+            >
+              View Case Study <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Right: scrollable list */}
+      <div className="cs-list" aria-label="Case study list">
+        {projects.map((proj, i) => {
+          const isAct = activeIdx === i;
+          return (
+            <button
+              key={proj.id}
+              className={`cs-list-item${isAct ? ' active' : ''}`}
+              onClick={() => setActiveIdx(i)}
+              aria-pressed={isAct}
+              style={{ '--accent': proj.accentColor }}
+            >
+              <span className="cs-num" style={{ color: isAct ? proj.accentColor : undefined }}>
+                0{i + 1}
+              </span>
+              <div className="cs-list-meta">
+                <span className="cs-list-title">{proj.title}</span>
+                <span className="cs-list-cat">{proj.eyebrow.split('·')[0].trim()}</span>
+              </div>
+              {isAct && <span className="cs-active-dot" style={{ background: proj.accentColor }} />}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   EXPERIENCE SECTION — company selector
+───────────────────────────────────────────────────────────────── */
+function ExperienceSection() {
+  const [activeComp, setActiveComp] = useState(0);
+  const exp = experience[activeComp];
+
+  return (
+    <div className="exp-selector">
+      {/* Left: company list */}
+      <nav className="exp-companies" aria-label="Company list">
+        {experience.map((e, i) => {
+          const isAct = activeComp === i;
+          return (
+            <button
+              key={e.company}
+              className={`exp-company-btn${isAct ? ' active' : ''}`}
+              onClick={() => setActiveComp(i)}
+              aria-pressed={isAct}
+            >
+              <div className="ecb-content">
+                <strong>{e.company}</strong>
+                <span>{e.role}</span>
+                <span className="ecb-period">{e.period}</span>
+              </div>
+              {e.current && <span className="exp-current-badge">Current</span>}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Right: detail panel */}
+      <div className="exp-detail" key={exp.company}>
+        <div className="exp-detail-header">
+          <div>
+            <h3 className="exp-detail-company">{exp.company}</h3>
+            <p className="exp-detail-role">{exp.role} · {exp.location}</p>
+            <span className="exp-detail-product">{exp.product}</span>
+          </div>
+          <span className="timeline-period">{exp.period}</span>
+        </div>
+        <p className="exp-detail-intro">{exp.intro}</p>
+        <div className="exp-highlights">
+          {exp.highlights.map(h => (
+            <div className="exp-highlight-row" key={h.title}>
+              <span className="hl-title">{h.title}</span>
+              <span className="hl-detail">{h.detail}</span>
+            </div>
+          ))}
+        </div>
+        <div className="tags" style={{ marginTop: 20 }}>
+          {exp.tags.map(t => <span key={t}>{t}</span>)}
         </div>
       </div>
     </div>
   );
 }
 
-function Section({ label, children }) {
+/* ─────────────────────────────────────────────────────────────────
+   STICKY NAV — appears after intro card scrolls past viewport
+───────────────────────────────────────────────────────────────── */
+function StickyNav({ activeSection, scrollTo, menuOpen, setMenuOpen, visible }) {
   return (
-    <div className="modal-section">
-      <h4 className="modal-label">{label}</h4>
-      {typeof children === 'string' ? <p>{children}</p> : children}
+    <header
+      className={`sticky-nav-wrap${visible ? ' sticky-nav-visible' : ''}`}
+      aria-hidden={!visible || undefined}
+    >
+      <nav className="nav container" aria-label="Main navigation">
+        <button className="brand" onClick={() => scrollTo('home')} aria-label="Go to top">
+          <span className="brand-mark" aria-hidden="true">AN</span>
+        </button>
+        <div className="nav-links desktop-nav">
+          {navItems.map(([id, label]) => (
+            <button
+              key={id}
+              onClick={() => scrollTo(id)}
+              className={activeSection === id ? 'nav-active' : ''}
+              aria-current={activeSection === id ? 'location' : undefined}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="nav-actions">
+          <button className="btn small desktop-cta" onClick={() => scrollTo('contact')}>
+            Reach Out <ArrowRight size={14} />
+          </button>
+          <button
+            className="icon-btn mobile-menu"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </nav>
+      {menuOpen && (
+        <div className="mobile-panel" role="navigation" aria-label="Mobile navigation">
+          {navItems.map(([id, label]) => (
+            <button key={id} onClick={() => scrollTo(id)}>{label}</button>
+          ))}
+        </div>
+      )}
+    </header>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   INTRO CARD — editorial hero with integrated navigation
+───────────────────────────────────────────────────────────────── */
+function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed }) {
+  return (
+    <div className="intro-card-wrap" id="home">
+      <div className="intro-card">
+
+        {/* A. Top navigation strip */}
+        <nav className="intro-nav" aria-label="Main navigation">
+          <button className="intro-nav-brand" onClick={() => scrollTo('home')} aria-label="Go to top">
+            <span className="intro-nav-mark" aria-hidden="true">AN</span>
+            <span className="intro-nav-name">ANKITA NANDAL</span>
+          </button>
+
+          <div className="intro-nav-links desktop-nav">
+            {navItems.map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => scrollTo(id)}
+                className={activeSection === id ? 'intro-nav-active' : ''}
+                aria-current={activeSection === id ? 'location' : undefined}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="intro-nav-actions">
+            <button
+              className="icon-btn mobile-menu"
+              onClick={() => setMenuOpen(o => !o)}
+              aria-expanded={menuOpen}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            >
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </nav>
+
+        {menuOpen && (
+          <div className="intro-mobile-panel" role="navigation" aria-label="Mobile navigation">
+            {navItems.map(([id, label]) => (
+              <button key={id} onClick={() => scrollTo(id)}>{label}</button>
+            ))}
+            <button onClick={() => scrollTo('contact')}>Reach Out</button>
+          </div>
+        )}
+
+        {/* B + C. Body: identity left, copy right */}
+        <div className="intro-body">
+
+          {/* B. Identity panel */}
+          <div className="intro-identity reveal">
+            <span className="intro-hey">Hey, I'm Ankita.</span>
+            <h2 className="intro-name">ANKITA<br />NANDAL</h2>
+            <span className="intro-role-tag">SDET</span>
+          </div>
+
+          {/* C. Statement + actions panel */}
+          <div className="intro-copy">
+            <div className="intro-divider-top" aria-hidden="true" />
+            <h1 className="intro-headline reveal delay-1">
+              The engineer who reads the system
+              <span className="intro-break"> then breaks it.</span>
+            </h1>
+            <p className="hero-typed reveal delay-2">
+              Testing{' '}
+              <span className="typed-word">{typed}<span className="cursor-blink">|</span></span>
+            </p>
+            <p className="intro-lead reveal delay-3">
+              UI, APIs, databases, ETL pipelines, AI/LLM systems, and integrations.
+              I understand flows, trace failures across layers, handle ambiguity, and
+              help teams ship with confidence.
+            </p>
+            <div className="intro-actions reveal delay-4">
+              <button className="btn" onClick={() => scrollTo('work')}>View Work <ArrowRight size={17} /></button>
+              <a className="btn ghost" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
+                <Download size={16} /> Download Resume
+              </a>
+            </div>
+            <div className="social-row reveal delay-4">
+              <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer">
+                <LinkedInIcon size={14} color="#0A66C2" /> LinkedIn
+              </a>
+              <a href="https://github.com" target="_blank" rel="noreferrer">
+                <BrandIcon icon={siGithub} size={14} color="var(--text)" /> GitHub
+              </a>
+              <a href="mailto:ankitanandal2009@gmail.com">
+                <Mail size={14} /> Email
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   APP
+   NAV BAR
 ───────────────────────────────────────────────────────────────── */
-function App() {
-  const [menuOpen,    setMenuOpen]    = useState(false);
-  const [modal,       setModal]       = useState(null);
-  const [skillFilter, setSkillFilter] = useState('All');
-  const [openExp,     setOpenExp]     = useState(null);
-  const [form, setForm] = useState({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' });
-  const [sent, setSent] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [sendError, setSendError] = useState(false);
+function NavBar({ activeSection, menuOpen, setMenuOpen, scrollTo }) {
+  return (
+    <header className="nav-wrap">
+      <nav className="nav container" aria-label="Main navigation">
+        <button className="brand" onClick={() => scrollTo('home')} aria-label="Go to top">
+          <span className="brand-mark" aria-hidden="true">AN</span>
+          <span>Ankita Nandal</span>
+        </button>
+        <div className="nav-links desktop-nav">
+          {navItems.map(([id, label]) => (
+            <button
+              key={id}
+              onClick={() => scrollTo(id)}
+              className={activeSection === id ? 'nav-active' : ''}
+              aria-current={activeSection === id ? 'location' : undefined}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="nav-actions">
+          <button className="btn small desktop-cta" onClick={() => scrollTo('contact')}>
+            Reach Out <ArrowRight size={14} />
+          </button>
+          <button
+            className="icon-btn mobile-menu"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </nav>
+      {menuOpen && (
+        <div className="mobile-panel" role="navigation" aria-label="Mobile navigation">
+          {navItems.map(([id, label]) => (
+            <button key={id} onClick={() => scrollTo(id)}>{label}</button>
+          ))}
+        </div>
+      )}
+    </header>
+  );
+}
 
+/* ─────────────────────────────────────────────────────────────────
+   CASE STUDY DETAIL PAGE
+───────────────────────────────────────────────────────────────── */
+function CdSection({ label, children }) {
+  return (
+    <div className="cd-section reveal">
+      <h2 className="cd-label">{label}</h2>
+      {children}
+    </div>
+  );
+}
+
+function CaseStudyDetailPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   useScrollReveal();
   const pct = useScrollProgress();
-  const typed = useTypewriter([
-    'APIs & backend systems.',
-    'ETL pipelines.',
-    'AI / LLM outputs.',
-    'databases & data flows.',
-    'payment gateways.',
-    'integrations.',
-  ]);
 
-  const handleContactSubmit = async e => {
-    e.preventDefault();
-    setSending(true);
-    setSendError(false);
-    try {
-      const res = await fetch('http://localhost:3001/api/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (data.success) { setSent(true); }
-      else { setSendError(true); }
-    } catch { setSendError(true); }
-    setSending(false);
-  };
+  const idx = projects.findIndex(p => p.id === id);
+  if (idx === -1) return <Navigate to="/" replace />;
+
+  const project = projects[idx];
+  const prev = idx > 0 ? projects[idx - 1] : null;
+  const next = idx < projects.length - 1 ? projects[idx + 1] : null;
+  const m = project.modal;
+
+  return (
+    <div className="app cd-page">
+      <div className="noise" />
+      <div className="scroll-progress" style={{ width: `${pct}%` }} />
+
+      {/* Top nav */}
+      <header className="cd-topnav">
+        <div className="container cd-topnav-inner">
+          <button className="cd-back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={16} /> Back to Case Studies
+          </button>
+          <span className="cd-eyebrow-small">{project.eyebrow}</span>
+        </div>
+      </header>
+
+      <main>
+        <div className="container cd-container">
+
+          {/* Header */}
+          <header className="cd-header reveal">
+            <div className="cd-illus-hero">
+              <CaseStudyIllustration id={project.id} color={project.accentColor} />
+            </div>
+            <small className="cd-eyebrow" style={{ color: project.accentColor }}>{project.eyebrow}</small>
+            <h1 className="cd-title">{project.title}</h1>
+            <p className="cd-summary">{project.summary}</p>
+            <div className="tags">
+              {project.tags.map(t => <span key={t}>{t}</span>)}
+            </div>
+          </header>
+
+          {/* Article body */}
+          <article className="cd-body">
+            <CdSection label="Context"><p>{m.context}</p></CdSection>
+            <CdSection label="What I Did"><p>{m.whatIDid}</p></CdSection>
+
+            <CdSection label="Responsibilities">
+              <ul className="cd-list">
+                {m.responsibilities.map(r => (
+                  <li key={r}><CheckCircle2 size={14} /><span>{r}</span></li>
+                ))}
+              </ul>
+            </CdSection>
+
+            <CdSection label="Challenges">
+              <ul className="cd-list cd-list--dash">
+                {m.challenges.map(c => (
+                  <li key={c}><span className="cd-dash">—</span><span>{c}</span></li>
+                ))}
+              </ul>
+            </CdSection>
+
+            <CdSection label="Testing Approach"><p>{m.approach}</p></CdSection>
+
+            <CdSection label="Tools Used">
+              <div className="cd-tags">
+                {m.tools.map(t => <span key={t}>{t}</span>)}
+              </div>
+            </CdSection>
+
+            <CdSection label="Achievements">
+              <ul className="cd-list">
+                {m.achievements.map(a => (
+                  <li key={a}><CheckCircle2 size={14} /><span>{a}</span></li>
+                ))}
+              </ul>
+            </CdSection>
+
+            <CdSection label="Impact">
+              <p className="cd-impact">{m.impact}</p>
+            </CdSection>
+
+            <CdSection label="Learnings"><p>{m.learnings}</p></CdSection>
+          </article>
+
+          {/* Prev / Next */}
+          <nav className="cd-prevnext" aria-label="Case study navigation">
+            {prev ? (
+              <button className="cd-nav-btn" onClick={() => navigate(`/case-studies/${prev.id}`)}>
+                <ArrowLeft size={16} />
+                <div><span>Previous</span><strong>{prev.title}</strong></div>
+              </button>
+            ) : <div />}
+            {next ? (
+              <button className="cd-nav-btn cd-nav-next" onClick={() => navigate(`/case-studies/${next.id}`)}>
+                <div><span>Next</span><strong>{next.title}</strong></div>
+                <ArrowRight size={16} />
+              </button>
+            ) : <div />}
+          </nav>
+        </div>
+      </main>
+
+      <footer>
+        <div className="container footer">
+          <span className="footer-copy">© {new Date().getFullYear()} Ankita Nandal · SDET</span>
+          <button className="footer-copy footer-back-link" onClick={() => navigate('/')}>← Back to portfolio</button>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   MAIN PAGE
+───────────────────────────────────────────────────────────────── */
+function MainPage() {
+  const [menuOpen,   setMenuOpen]   = useState(false);
+  const [form,       setForm]       = useState({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' });
+  const [sent,       setSent]       = useState(false);
+  const [sending,    setSending]    = useState(false);
+  const [sendError,  setSendError]  = useState(false);
+  const navigate = useNavigate();
+  const introCardRef = useRef(null);
+
+  useScrollReveal();
+  const pct           = useScrollProgress();
+  const activeSection = useActiveSection(NAV_IDS);
+  const typed         = useTypewriter(['APIs & backend systems.', 'ETL pipelines.', 'AI / LLM outputs.', 'databases & data flows.', 'payment gateways.', 'integrations.']);
+  const introPast     = useIntroPast(introCardRef);
 
   const scrollTo = useCallback(id => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     setMenuOpen(false);
   }, []);
 
-  const visibleSkills = skillFilter === 'All' ? skillData : skillData.filter(s => s.cat === skillFilter);
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setSending(true);
+    setSendError(false);
+    try {
+      const res  = await fetch('http://localhost:3001/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      const data = await res.json();
+      if (data.success) setSent(true); else setSendError(true);
+    } catch { setSendError(true); }
+    setSending(false);
+  };
 
   return (
     <div className="app">
       <div className="noise" />
       <div className="scroll-progress" style={{ width: `${pct}%` }} />
-      {modal && <ProjectModal project={modal} onClose={() => setModal(null)} />}
 
-      {/* ── NAV ── */}
-      <header className="nav-wrap">
-        <nav className="nav container">
-          <button className="brand" onClick={() => scrollTo('home')}>
-            <span className="brand-mark">AN</span>
-            <span>Ankita Nandal</span>
-          </button>
-          <div className="nav-links desktop-nav">
-            {navItems.map(([id, label]) => (
-              <button key={id} onClick={() => scrollTo(id)}>{label}</button>
-            ))}
-          </div>
-          <div className="nav-actions">
-            <button className="btn small desktop-cta" onClick={() => scrollTo('contact')}>Reach Out <ArrowRight size={14} /></button>
-            <button className="icon-btn mobile-menu" onClick={() => setMenuOpen(o => !o)}>
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </nav>
-        {menuOpen && (
-          <div className="mobile-panel">
-            {navItems.map(([id, label]) => <button key={id} onClick={() => scrollTo(id)}>{label}</button>)}
-          </div>
-        )}
-      </header>
+      {/* ── STICKY NAV (appears after intro card scrolls away) ── */}
+      <StickyNav
+        activeSection={activeSection}
+        scrollTo={scrollTo}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        visible={introPast}
+      />
+
+      {/* ── INTRO CARD (hero + embedded nav) ── */}
+      <div ref={introCardRef}>
+        <IntroCard
+          activeSection={activeSection}
+          scrollTo={scrollTo}
+          menuOpen={menuOpen}
+          setMenuOpen={setMenuOpen}
+          typed={typed}
+        />
+      </div>
 
       <main>
-        {/* ── HERO ── */}
-        <section id="home" className="hero container section-pad">
-          <div className="hero-copy">
-            <div className="hero-role reveal">SDET</div>
-            <h1 className="reveal delay-1">
-              The engineer who reads<br />the system — then breaks it.
-            </h1>
-            <p className="hero-typed reveal delay-2">
-              Testing{' '}
-              <span className="typed-word">{typed}<span className="cursor-blink">|</span></span>
-            </p>
-            <p className="hero-lead reveal delay-3">
-              UI, APIs, databases, ETL pipelines, AI/LLM systems, and integrations.
-              I understand flows, trace failures across layers, handle ambiguity, and
-              help teams ship with confidence.
-            </p>
-            <div className="hero-actions reveal delay-4">
-              <button className="btn" onClick={() => scrollTo('work')}>View Work <ArrowRight size={17} /></button>
-              <a className="btn ghost" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
-                <Download size={16} /> Download Resume
-              </a>
-              <button className="btn outline" onClick={() => scrollTo('contact')}>Reach Out</button>
-            </div>
-            <div className="social-row reveal delay-4">
-              <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer"><ExternalLink size={14} />LinkedIn</a>
-              <a href="https://github.com" target="_blank" rel="noreferrer"><Code2 size={14} />GitHub</a>
-              <a href="mailto:ankitanandal2009@gmail.com"><Mail size={14} />Email</a>
-            </div>
-          </div>
 
-          <div className="hero-grid">
-            <div className="bento primary-card reveal-right delay-1">
-              <span className="status"><i />Currently at Fermi Development</span>
-              <h3>AI platform QA — agents, RAG, ETL, and release confidence</h3>
-              <p>Validating LLM responses, MCP agents, data pipelines, and cross-service sync in a production AI system.</p>
+        {/* ── 2. HOW I WORK ── */}
+        <section id="method" className="method-section section-pad">
+          <div className="container">
+            <div className="section-heading reveal">
+              <div>
+                <div className="eyebrow">HOW I WORK</div>
+                <h2>A method, not just a checklist</h2>
+              </div>
+              <p>Quality comes from how you think about a system, not just how many tests you write.</p>
             </div>
-            <StatCard target={2.5} suffix="+" label="years of QA experience" />
-            <StatCard target={3}   suffix=""  label="companies and domains"  />
-            <div className="bento quote-card reveal-right delay-3">
-              <Quote size={18} />
-              <p>"A bug caught before release is trust maintained after it."</p>
+            <MethodAccordion />
+          </div>
+        </section>
+
+        {/* ── 3. SKILLS & TOOLS ── */}
+        <section id="skills" className="skills-section section-pad">
+          <div className="container">
+            <SkillsSection />
+          </div>
+        </section>
+
+        {/* ── 4. LEARNING ── */}
+        <section id="learning" className="learning-section section-pad">
+          <div className="container">
+            <div className="section-heading reveal">
+              <div>
+                <div className="eyebrow">CONTINUOUS GROWTH</div>
+                <h2>What I'm actively exploring</h2>
+              </div>
+              <p>Each area below reflects a deliberate investment — not just curiosity, but focused depth-building toward where the field is heading.</p>
+            </div>
+
+            <div className="learning-scroll-wrap">
+              <div className="learning-strip">
+                {learningItems.map((c, i) => {
+                  const Icon = c.icon;
+                  return (
+                    <article
+                      key={c.title}
+                      className="learning-card reveal"
+                      style={{ transitionDelay: `${i * .1}s`, '--learn-accent': c.accent, '--learn-color': c.statusColor }}
+                    >
+                      <div className="lc-top">
+                        <div className="lc-icon" style={{ background: c.accent, color: c.statusColor }}><Icon size={22} /></div>
+                        <span className="lc-status" style={{ background: c.accent, color: c.statusColor }}>{c.status}</span>
+                      </div>
+                      <h3>{c.title}</h3>
+                      <p>{c.text}</p>
+                      <div className="lc-tools">{c.what}</div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="article-preview reveal">
+              <div>
+                <span className="status"><i />First article in progress</span>
+                <h3>Testing an AI system beyond the answer on screen</h3>
+                <p>Tracing retrieval, MCP tool calls, data pipelines, logs, and failure patterns — rather than asserting on the final response.</p>
+              </div>
+              <button className="btn gold"><BookOpen size={16} /> Read when published</button>
             </div>
           </div>
         </section>
 
-        {/* ── WORK ── */}
-        <section id="work" className="container section-pad">
-          <div className="section-heading reveal">
-            <div>
-              <div className="eyebrow">CASE STUDIES</div>
-              <h2>Real work, real problems, real outcomes</h2>
+        {/* ── 5. CASE STUDIES ── */}
+        <section id="work" className="work-section section-pad">
+          <div className="container">
+            <div className="section-heading reveal">
+              <div>
+                <div className="eyebrow">CASE STUDIES</div>
+                <h2>Real work, real problems, real outcomes</h2>
+              </div>
+              <p>Select a case study to preview. Click View Case Study to read the full write-up.</p>
             </div>
-            <p>Click any card to open a full case study — context, approach, tools, impact, and learnings.</p>
-          </div>
-          <div className="project-grid">
-            {projects.map((p, i) => {
-              const Icon = p.icon;
-              return (
-                <article
-                  key={p.id}
-                  className="project-card reveal"
-                  style={{ transitionDelay: `${i * .08}s`, '--accent': p.accentColor }}
-                  onClick={() => setModal(p)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={e => e.key === 'Enter' && setModal(p)}
-                  aria-label={`Open case study: ${p.title}`}
-                >
-                  <div className="project-top">
-                    <span className="project-icon"><Icon size={22} /></span>
-                    <span className="project-open"><ArrowUpRight size={18} /></span>
-                  </div>
-                  <small>{p.eyebrow}</small>
-                  <h3>{p.title}</h3>
-                  <p>{p.summary}</p>
-                  <div className="tags">{p.tags.map(t => <span key={t}>{t}</span>)}</div>
-                  <span className="project-cta">Open case study <ArrowRight size={15} /></span>
-                </article>
-              );
-            })}
+            <CaseStudySection />
           </div>
         </section>
 
-        {/* ── EXPERIENCE ── */}
+        {/* ── 6. EXPERIENCE ── */}
         <section id="experience" className="experience-section section-pad">
           <div className="container">
             <div className="section-heading reveal">
@@ -847,231 +1581,11 @@ function App() {
               </div>
               <p>From functional testing to AI systems — each role added technical depth, broader ownership, and stronger collaboration.</p>
             </div>
-            <div className="timeline">
-              {experience.map((e, i) => {
-                const isOpen = openExp === i;
-                return (
-                  <div className="timeline-item reveal" key={e.company} style={{ transitionDelay: `${i * .12}s` }}>
-                    <div className="timeline-left">
-                      <div className={`timeline-dot timeline-dot--s${experience.length - i}${e.current ? ' timeline-dot--current' : ''}`}>
-                        {experience.length - i}
-                      </div>
-                      {i < experience.length - 1 && <div className="timeline-line" />}
-                    </div>
-                    <div className="timeline-card">
-                      <div className="timeline-head">
-                        <div>
-                          <h3>{e.company}</h3>
-                          <p>{e.role} · {e.location}</p>
-                          <span className="timeline-product">{e.product}</span>
-                        </div>
-                        <span className="timeline-period">{e.period}</span>
-                      </div>
-                      <p className="timeline-intro">{e.intro}</p>
-                      <button
-                        className="text-btn"
-                        onClick={() => setOpenExp(isOpen ? null : i)}
-                      >
-                        {isOpen ? 'Show less' : 'Show responsibilities'}
-                        <ChevronDown className={isOpen ? 'rotated' : ''} size={17} />
-                      </button>
-                      {isOpen && (
-                        <div className="timeline-details">
-                          {e.highlights.map(h => (
-                            <div className="timeline-highlight" key={h.title}>
-                              <span className="hl-title">{h.title}</span>
-                              <span className="hl-detail">{h.detail}</span>
-                            </div>
-                          ))}
-                          <div className="tags" style={{ marginTop: 16 }}>{e.tags.map(t => <span key={t}>{t}</span>)}</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <ExperienceSection />
           </div>
         </section>
 
-        {/* ── SKILLS & TOOLS ── */}
-        <section id="skills" className="skills-section section-pad">
-          <div className="container">
-            {/* Capabilities */}
-            <div className="section-heading reveal">
-              <div>
-                <div className="eyebrow">TOOLS, TECHNOLOGIES & PLATFORMS</div>
-                <h2>Where I operate and what I use</h2>
-              </div>
-              <p>Capability areas, filterable skills, and the full tech stack — all in one place.</p>
-            </div>
-            <div className="capabilities-grid reveal">
-              {capabilities.map(c => {
-                const Icon = c.icon;
-                return (
-                  <div className="cap-card" key={c.label}>
-                    <Icon size={22} />
-                    <div>
-                      <strong>{c.label}</strong>
-                      <p>{c.desc}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* AI Quality disciplines — standalone band */}
-            <div className="ai-quality-band reveal" style={{ marginTop: 48 }}>
-              <div className="ai-quality-head">
-                <BrainCircuit size={18} />
-                <div>
-                  <span className="aqb-label">AI Quality Disciplines</span>
-                  <span className="aqb-note">Evaluated through behaviour and contracts — not pass/fail assertions</span>
-                </div>
-              </div>
-              <div className="ai-quality-grid">
-                {aiQualityDisciplines.map(d => (
-                  <div className="ai-quality-card" key={d.n}>
-                    <span className="aqc-dot" />
-                    <div>
-                      <strong>{d.n}</strong>
-                      <p>{d.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bridge */}
-            <div className="stack-bridge reveal">
-              <span className="bridge-line" />
-              <span className="bridge-label">tools & platforms behind the work</span>
-              <span className="bridge-line" />
-            </div>
-
-            {/* Integrated filter → badges + tools together */}
-            <div className="skills-filter reveal" style={{ marginTop: 0 }}>
-              <div className="filter-row">
-                {skillCats.map(cat => (
-                  <button
-                    key={cat}
-                    className={`filter-btn${skillFilter === cat ? ' active' : ''}`}
-                    onClick={() => setSkillFilter(cat)}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-
-              {/* tool chips — filtered by category */}
-              <div className="tool-groups-wrap">
-                {toolGroups
-                  .filter(g => {
-                    if (skillFilter === 'All') return true;
-                    const map = {
-                      'Automation':          'Automation',
-                      'API & Integration':   'API & Integration',
-                      'Databases':           'Databases',
-                      'Data, Search & ETL':  'Data, Search & ETL',
-                      'Cloud & DevOps':      'Cloud & DevOps',
-                      'Test Management':     'Test & Defect Management',
-                      'Performance & Mobile':'Performance & Mobile',
-                      'Payments':            'Payments',
-                    };
-                    return g.label === map[skillFilter];
-                  })
-                  .map(g => (
-                    <div className="tool-group" key={g.label}>
-                      <div className="tool-group-header" style={{ '--gc': g.color }}>
-                        <span>{g.label}</span>
-                        <span>{g.tools.length} tools</span>
-                      </div>
-                      <div className="tool-row">
-                        {g.tools.map(t => (
-                              <div className="tool-chip" key={t.n} style={{ '--gc': g.color }}>
-                                <span className="tool-brand-icon"><BrandIcon icon={t.icon} size={16} color={t.c} /></span>
-                                <span>{t.n}</span>
-                              </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))
-                }
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── HOW I WORK ── */}
-        <section className="method-section section-pad">
-          <div className="container">
-            <div className="section-heading reveal">
-              <div>
-                <div className="eyebrow">HOW I WORK</div>
-                <h2>A method, not just a checklist</h2>
-              </div>
-              <p>Quality comes from how you think about a system, not just how many tests you write.</p>
-            </div>
-            <div className="method-grid">
-              {methodSteps.map((s, i) => {
-                const Icon = s.icon;
-                return (
-                  <div className="method-card reveal" key={s.n} style={{ transitionDelay: `${i * .09}s` }}>
-                    <div className="method-num">{s.n}</div>
-                    <div className="method-icon"><Icon size={22} /></div>
-                    <h4>{s.title}</h4>
-                    <p>{s.body}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* ── LEARNING ── */}
-        <section id="learning" className="container section-pad">
-          <div className="section-heading reveal">
-            <div>
-              <div className="eyebrow">CONTINUOUS GROWTH</div>
-              <h2>What I'm actively exploring</h2>
-            </div>
-            <p>Each area below reflects a deliberate investment — not just curiosity, but focused depth-building toward where the field is heading.</p>
-          </div>
-          <div className="learning-grid">
-            {learningItems.map((c, i) => {
-              const Icon = c.icon;
-              return (
-                <article
-                  className="learning-card reveal"
-                  key={c.title}
-                  style={{ transitionDelay: `${i * .1}s`, '--learn-accent': c.accent, '--learn-color': c.statusColor }}
-                >
-                  <div className="lc-top">
-                    <div className="lc-icon" style={{ background: c.accent, color: c.statusColor }}>
-                      <Icon size={24} />
-                    </div>
-                    <span className="lc-status" style={{ background: c.accent, color: c.statusColor }}>
-                      {c.status}
-                    </span>
-                  </div>
-                  <h3>{c.title}</h3>
-                  <p>{c.text}</p>
-                  <div className="lc-tools">{c.what}</div>
-                </article>
-              );
-            })}
-          </div>
-          <div className="article-preview reveal">
-            <div>
-              <span className="status"><i />First article in progress</span>
-              <h3>Testing an AI system beyond the answer on screen</h3>
-              <p>Tracing retrieval, MCP tool calls, data pipelines, logs, and failure patterns — rather than asserting on the final response.</p>
-            </div>
-            <button className="btn gold">Read when published <BookOpen size={16} /></button>
-          </div>
-        </section>
-
-        {/* ── RESUME ── */}
+        {/* ── 7. RESUME ── */}
         <section id="resume" className="resume-section section-pad">
           <div className="container">
             <div className="section-heading reveal">
@@ -1087,8 +1601,7 @@ function App() {
                   <div className="rm-name">Ankita Nandal</div>
                   <div className="rm-title">Software Development Engineer in Test</div>
                   <div className="rm-contact">
-                    <svg width={11} height={11} viewBox="0 0 24 24" fill="#0A66C2" aria-hidden="true" style={{flexShrink:0,marginTop:1}}><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                    LinkedIn
+                    <LinkedInIcon size={11} color="#0A66C2" /> LinkedIn
                   </div>
                   <div className="rm-divider" />
                   <div className="rm-section">
@@ -1117,64 +1630,98 @@ function App() {
                   <div><strong>8+</strong><span>Skill categories</span></div>
                   <div><strong>30+</strong><span>Tools in stack</span></div>
                 </div>
-                <a className="btn" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
-                  <Download size={17} /> Download Resume (PDF)
-                </a>
+                <div className="resume-btns">
+                  <a className="btn" href="/Ankita_Nandal_SDET.pdf" target="_blank" rel="noreferrer">
+                    <ExternalLink size={16} /> View Resume
+                  </a>
+                  <a className="btn ghost" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
+                    <Download size={16} /> Download PDF
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── CONTACT ── */}
-        <section id="contact" className="container section-pad">
-          <div className="contact-shell reveal">
-            <div className="contact-copy">
-              <div className="eyebrow">REACH OUT</div>
-              <h2>Let's talk testing, quality, or what you're building.</h2>
-              <p>Your message opens directly in your email app. No form submissions lost, no black holes.</p>
-              <div className="contact-links">
-                <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer">
-                  <ExternalLink size={16} /> LinkedIn
-                </a>
-                <a href="https://github.com" target="_blank" rel="noreferrer">
-                  <Code2 size={16} /> GitHub
-                </a>
+        {/* ── 8. REACH OUT ── */}
+        <section id="contact" className="contact-section section-pad">
+          <div className="container">
+            <div className="contact-shell reveal">
+              <div className="contact-copy">
+                <div className="eyebrow">REACH OUT</div>
+                <h2>Let's talk testing, quality, or what you're building.</h2>
+                <p>Your message opens directly in my inbox. No form submissions lost, no black holes.</p>
+
+                <div className="contact-links">
+                  <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer" aria-label="LinkedIn profile">
+                    <LinkedInIcon size={18} color="#0A66C2" /> LinkedIn
+                  </a>
+                  <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub profile">
+                    <BrandIcon icon={siGithub} size={18} color="var(--text)" /> GitHub
+                  </a>
+                  <a href="mailto:ankitanandal2009@gmail.com" aria-label="Send email">
+                    <BrandIcon icon={siGmail} size={18} color="#EA4335" /> ankitanandal2009@gmail.com
+                  </a>
+                </div>
+
+                <div className="contact-points">
+                  <span><CheckCircle2 size={16} /> Open to full-time SDET and QA engineering roles</span>
+                  <span><CheckCircle2 size={16} /> Teams building AI, data, or complex backend systems</span>
+                  <span><CheckCircle2 size={16} /> Honest conversations about testing and engineering</span>
+                </div>
               </div>
-              <div className="contact-points">
-                <span><CheckCircle2 size={16} /> Open to full-time SDET and QA engineering roles</span>
-                <span><CheckCircle2 size={16} /> Teams building AI, data, or complex backend systems</span>
-                <span><CheckCircle2 size={16} /> Honest conversations about testing and engineering</span>
-              </div>
+
+              {sent ? (
+                <div className="contact-success">
+                  <CheckCircle2 size={44} strokeWidth={1.5} />
+                  <h3>Sent.</h3>
+                  <p>Your message landed in my inbox. I'll get back to you soon.</p>
+                  <button
+                    className="btn ghost"
+                    onClick={() => { setSent(false); setSendError(false); setForm({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' }); }}
+                  >Send another</button>
+                </div>
+              ) : (
+                <form className="contact-form" onSubmit={handleSubmit} noValidate>
+                  <label>
+                    Name
+                    <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name" />
+                  </label>
+                  <label>
+                    Email
+                    <input required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@company.com" />
+                  </label>
+                  <label>
+                    Topic
+                    <select value={form.topic} onChange={e => setForm({ ...form, topic: e.target.value })}>
+                      <option>Discuss a QA opportunity</option>
+                      <option>Ask about my work</option>
+                      <option>Technical collaboration</option>
+                      <option>Something else</option>
+                    </select>
+                  </label>
+                  <label>
+                    Message
+                    <textarea
+                      required
+                      rows={5}
+                      value={form.message}
+                      onChange={e => setForm({ ...form, message: e.target.value })}
+                      placeholder={
+                        form.topic === 'Discuss a QA opportunity'  ? 'Tell me about the role, team size, and what you are looking for in a QA engineer...' :
+                        form.topic === 'Ask about my work'         ? 'Which project or area are you curious about? Happy to go deeper...' :
+                        form.topic === 'Technical collaboration'   ? 'What are you building, and where does quality fit in? I would love to hear...' :
+                                                                     'Go ahead — what is on your mind?'
+                      }
+                    />
+                  </label>
+                  {sendError && <p className="contact-error">Something went wrong — try again or reach me on LinkedIn.</p>}
+                  <button className="btn" type="submit" disabled={sending}>
+                    {sending ? 'Sending…' : <><span>Start a Conversation</span> <ArrowRight size={17} /></>}
+                  </button>
+                </form>
+              )}
             </div>
-            {sent ? (
-              <div className="contact-success">
-                <CheckCircle2 size={44} strokeWidth={1.5} />
-                <h3>Sent.</h3>
-                <p>Your message landed in my inbox. I'll get back to you soon.</p>
-                <button className="btn btn--outline" onClick={() => { setSent(false); setSendError(false); setForm({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' }); }}>Send another</button>
-              </div>
-            ) : (
-              <form className="contact-form" onSubmit={handleContactSubmit}>
-                <label>Name<input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name" /></label>
-                <label>Email<input required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@company.com" /></label>
-                <label>Topic
-                  <select value={form.topic} onChange={e => setForm({ ...form, topic: e.target.value })}>
-                    <option>Discuss a QA opportunity</option>
-                    <option>Ask about my work</option>
-                    <option>Technical collaboration</option>
-                    <option>Something else</option>
-                  </select>
-                </label>
-                <label>Message<textarea required rows={5} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder={
-                  form.topic === 'Discuss a QA opportunity'  ? 'Tell me about the role, team size, and what you are looking for in a QA engineer...' :
-                  form.topic === 'Ask about my work'         ? 'Which project or area are you curious about? Happy to go deeper...' :
-                  form.topic === 'Technical collaboration'   ? 'What are you building, and where does quality fit in? I would love to hear...' :
-                                                              'Go ahead — what is on your mind?'
-                } /></label>
-                {sendError && <p className="contact-error">Something went wrong — try again or reach me on LinkedIn.</p>}
-                <button className="btn" type="submit" disabled={sending}>{sending ? 'Sending…' : <><span>Start a Conversation</span><ArrowRight size={17} /></>}</button>
-              </form>
-            )}
           </div>
         </section>
       </main>
@@ -1186,6 +1733,21 @@ function App() {
         </div>
       </footer>
     </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   APP — router root
+───────────────────────────────────────────────────────────────── */
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/case-studies/:id" element={<CaseStudyDetailPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
