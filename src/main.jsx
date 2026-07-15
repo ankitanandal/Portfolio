@@ -6,8 +6,8 @@ import {
 import {
   ArrowLeft, ArrowRight, BookOpen, BrainCircuit, CheckCircle2, ChevronDown,
   Code2, Database, Download, ExternalLink, GitBranch, Globe,
-  Layers3, Mail, Menu, MessageSquareText, SearchCheck,
-  ShieldCheck, TestTube2, X, Zap, Webhook, Cloud,
+  Layers3, Mail, Menu, MessageSquareText, Moon, SearchCheck,
+  ShieldCheck, Sun, TestTube2, X, Zap, Webhook, Cloud,
 } from 'lucide-react';
 import {
   siPython, siPytest, siSelenium,
@@ -55,6 +55,10 @@ const projects = [
     title: 'End-to-End Testing of an AI-Powered Operations Platform',
     summary: 'Owned quality across a full-stack AI platform — chat workflows, RAG retrieval, MCP agent integrations, ETL pipelines, connector ingestion, and analytics — from test design to release validation.',
     tags: ['RAG Validation', 'MCP Agents', 'LLM Eval', 'ETL', 'Postman', 'Python'],
+    previewSummary: 'Tested AI workflows across ingestion, retrieval, agents, APIs, data stores, and user-facing responses.',
+    previewTags: ['RAG Validation', 'ETL', 'MCP Agents'],
+    metric: '50% less repetitive QA effort',
+    previewFlow: ['Data Source', 'ETL', 'RAG / AI', 'Response'],
     accentColor: '#3a8a56',
     modal: {
       context: 'Fermi Development is a B2B SaaS company building an AI-powered enterprise operations platform. It connects business data from documents, databases, applications, and external connectors — processing it through ingestion and transformation pipelines, then making it available to AI agents, search, analytics, and conversational workflows. Every layer is interconnected: a field-mapping error during ingestion can appear as an inaccurate AI response rather than an obvious pipeline error.',
@@ -94,6 +98,10 @@ const projects = [
     title: 'ETL Pipeline and Multi-System Data Validation',
     summary: 'Designed and executed full pipeline QA from multi-source ingestion through transformation, storage, search indexing, and downstream AI consumption — catching failures invisible to feature tests.',
     tags: ['ETL', 'Airbyte', 'OpenSearch', 'Neo4j', 'Elasticsearch', 'SQL'],
+    previewSummary: 'Source-to-target validation across ingestion, transformation, and 4 storage systems — catching silent data failures before they reached the AI layer.',
+    previewTags: ['ETL', 'Airbyte', 'OpenSearch'],
+    metric: '3 critical bugs caught pre-production',
+    previewFlow: ['Source', 'Airbyte ETL', 'Transform', 'Storage'],
     accentColor: '#c9a96e',
     modal: {
       context: 'The platform ingested data from multiple sources — file uploads, API connectors via Airbyte, and database feeds — processing it through transformation layers before storing to MongoDB, building graph relationships in Neo4j, and indexing for search in OpenSearch and Elasticsearch. This data ultimately fed the AI system. Silent data corruption here meant corrupted AI responses.',
@@ -130,8 +138,12 @@ const projects = [
     icon: ShieldCheck,
     eyebrow: 'PAYMENTS · BRIDGING TECHNOLOGIES',
     title: 'Payment Gateway and Subscription Lifecycle Testing',
-    summary: 'Validated end-to-end payment flows across Stripe subscriptions, Nexio transactions, and webhook-driven billing events — across web, Android, and iOS — with zero payment bugs reaching production.',
+    summary: 'Validated end-to-end payment flows across Stripe subscriptions, Nexio transactions, and webhook-driven billing events — across web, Android, and iOS — testing every layer from UI through API, webhooks, and database.',
     tags: ['Stripe', 'Nexio', 'Webhooks', 'REST API', 'Mobile', 'MySQL'],
+    previewSummary: 'Validated end-to-end payment flows across Stripe, Nexio, and webhooks — across web, Android, and iOS.',
+    previewTags: ['Stripe', 'Nexio', 'Webhooks'],
+    metric: 'Double-billing webhook bug caught pre-release',
+    previewFlow: ['Client', 'Checkout API', 'Payment GW', 'Billing'],
     accentColor: '#c27455',
     modal: {
       context: 'The SaaS platform managed user subscriptions through Stripe, handled one-time payments through Nexio, and relied on webhooks to drive billing state changes in real time. Payment bugs directly translated to revenue loss, user trust damage, and support escalations. The platform served web, Android, and iOS simultaneously — each with its own checkout implementation.',
@@ -171,6 +183,10 @@ const projects = [
     title: 'Testing an AI-Based Social Media Automation Platform',
     summary: 'Validated AI content generation, scheduling logic, NLP outputs, cross-platform API compliance, and AWS infrastructure across LinkedIn, Instagram, and Twitter.',
     tags: ['AI Content QA', 'NLP Testing', 'REST API', 'AWS EC2', 'MySQL'],
+    previewSummary: 'Validated AI content generation, scheduling logic, and cross-platform API compliance across LinkedIn, Instagram, and Twitter.',
+    previewTags: ['AI Content QA', 'NLP Testing', 'REST API'],
+    metric: 'Silent scheduling bug caught at peak',
+    previewFlow: ['User Input', 'AI Generator', 'NLP Gate', 'Platforms'],
     accentColor: '#8b6f5e',
     modal: {
       context: 'Bridging Technologies built an AI-powered social media automation platform that generated content, scheduled posts, and managed engagement workflows across LinkedIn, Instagram, and Twitter. The AI layer produced content based on user inputs and platform-specific engagement rules — making output quality, correctness, and compliance central testing concerns.',
@@ -208,6 +224,10 @@ const projects = [
     title: 'Cross-Platform Testing of a Fitness and Booking Application',
     summary: 'Designed structured test cases in TestRail, executed regression and E2E testing across web, Android, and iOS, and validated Nexio payment flows — building the foundation of a systematic QA practice.',
     tags: ['Manual Testing', 'TestRail', 'Nexio', 'Android', 'iOS', 'Regression'],
+    previewSummary: 'Designed test cases, ran regression cycles, and validated Nexio payment flows across web, Android, and iOS.',
+    previewTags: ['Manual Testing', 'TestRail', 'Regression'],
+    metric: 'First structured QA practice built',
+    previewFlow: ['Web / Mobile', 'API Gateway', 'Backend', 'DB + Payments'],
     accentColor: '#c9a96e',
     modal: {
       context: 'Tiara IT Services built a cross-platform fitness and booking application serving users across web browsers, Android phones, and iOS devices. The app handled class bookings, subscription management, trainer scheduling, and payment processing through Nexio. Functional consistency across all platforms was a core requirement.',
@@ -583,6 +603,16 @@ function useIntroPast(ref) {
     return () => io.disconnect();
   }, [ref]);
   return past;
+}
+
+function useTheme() {
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+  const toggleTheme = useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), []);
+  return [theme, toggleTheme];
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -985,6 +1015,79 @@ function CaseStudyIllustration({ id, color }) {
 /* ─────────────────────────────────────────────────────────────────
    CASE STUDY SECTION — split layout
 ───────────────────────────────────────────────────────────────── */
+/* ── Simple 4-node flow diagram for the preview card ── */
+function CaseStudyPreviewVisual({ flow, color }) {
+  /*
+   * Layout math (viewBox 400 × 170):
+   *   NW=82, NH=60, GAP=16, pad=12
+   *   xs = [12, 110, 208, 306]  → last right edge 306+82=388 ≤ 400 ✓
+   *   cY = 88  (node centre Y)
+   *   node top = cY-NH/2=58,  node bottom = cY+NH/2=118
+   */
+  const NW = 82, NH = 60, cY = 88, GAP = 16;
+  const xs = flow.map((_, i) => 12 + i * (NW + GAP));
+  const nodeTop = cY - NH / 2;
+
+  const splitLabel = (label) => {
+    const words = label.split(' ');
+    if (words.length <= 2) return [label, null];
+    const half = Math.ceil(words.length / 2);
+    return [words.slice(0, half).join(' '), words.slice(half).join(' ')];
+  };
+
+  return (
+    <svg viewBox="0 0 400 170" className="cs-preview-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="170" fill="var(--illus-bg)"/>
+      <rect width="400" height="3" fill={color} opacity=".5"/>
+      <text x="14" y="26" fontSize="8.5" fontFamily="DM Mono,monospace"
+        fontWeight="700" fill={color} opacity=".65" letterSpacing="1.2">SYSTEM FLOW</text>
+      <line x1={xs[0]} y1={cY} x2={xs[3] + NW} y2={cY}
+        stroke={color} strokeWidth=".8" opacity=".12" strokeDasharray="5 4"/>
+      {[0, 1, 2].map(i => {
+        const x1 = xs[i] + NW + 2, x2 = xs[i + 1] - 2;
+        return (
+          <g key={i}>
+            <line x1={x1} y1={cY} x2={x2 - 8} y2={cY}
+              stroke={color} strokeWidth="1.8" opacity=".5" strokeLinecap="round"/>
+            <polygon points={`${x2},${cY} ${x2-8},${cY-5} ${x2-8},${cY+5}`}
+              fill={color} opacity=".7"/>
+          </g>
+        );
+      })}
+      {flow.map((label, i) => {
+        const x = xs[i], cx = x + NW / 2;
+        const [l1, l2] = splitLabel(label);
+        const ty1 = l2 ? cY - 3 : cY + 5;
+        return (
+          <g key={i}>
+            <rect x={x} y={nodeTop} width={NW} height={NH} rx="9"
+              fill={color} opacity=".1"/>
+            <rect x={x} y={nodeTop} width={NW} height={NH} rx="9"
+              fill="none" stroke={color} strokeWidth="1.6"/>
+            <rect x={x+7} y={nodeTop+7} width="18" height="11" rx="3"
+              fill={color} opacity=".22"/>
+            <text x={x+16} y={nodeTop+16} textAnchor="middle"
+              fontSize="7" fontFamily="DM Mono,monospace" fontWeight="700" fill={color}>
+              {String(i + 1).padStart(2, '0')}
+            </text>
+            <text x={cx} y={ty1} textAnchor="middle"
+              fontSize="10.5" fontWeight="800" fontFamily="Manrope,sans-serif"
+              fill="var(--illus-fg)">{l1}</text>
+            {l2 && (
+              <text x={cx} y={ty1+13} textAnchor="middle"
+                fontSize="10" fontWeight="700" fontFamily="Manrope,sans-serif"
+                fill={color}>{l2}</text>
+            )}
+          </g>
+        );
+      })}
+      <text x="200" y="156" textAnchor="middle"
+        fontSize="8" fontFamily="DM Mono,monospace"
+        fill={color} opacity=".5" letterSpacing=".6">✓ quality validated at each layer</text>
+    </svg>
+  );
+}
+
 function CaseStudySection() {
   const [activeIdx, setActiveIdx] = useState(0);
   const navigate = useNavigate();
@@ -992,27 +1095,37 @@ function CaseStudySection() {
 
   return (
     <div className="cs-split">
-      {/* Left: preview */}
+      {/* Left: preview card */}
       <div className="cs-preview">
         <div className="cs-preview-card reveal-left">
+
+          {/* Visual area — theme-adaptive background, simple flow diagram */}
           <div className="cs-illus-wrap">
-            <CaseStudyIllustration id={p.id} color={p.accentColor} />
+            <CaseStudyPreviewVisual flow={p.previewFlow} color={p.accentColor} />
           </div>
+
+          {/* Content area — lighter */}
           <div className="cs-preview-body">
             <small className="cs-eyebrow" style={{ color: p.accentColor }}>{p.eyebrow}</small>
             <h3 className="cs-preview-title">{p.title}</h3>
-            <p className="cs-preview-summary">{p.summary}</p>
-            <div className="tags">
-              {p.tags.map(t => <span key={t}>{t}</span>)}
+            <p className="cs-preview-summary">{p.previewSummary}</p>
+            <div className="tags cs-tags">
+              {p.previewTags.map(t => <span key={t}>{t}</span>)}
             </div>
-            <button
-              className="btn cs-cta"
-              onClick={() => navigate(`/case-studies/${p.id}`)}
-              style={{ '--accent': p.accentColor }}
-            >
-              View Case Study <ArrowRight size={16} />
-            </button>
+            <div className="cs-preview-foot">
+              <span className="cs-metric" style={{ color: p.accentColor }}>
+                ◆ {p.metric}
+              </span>
+              <button
+                className="cs-cta-link"
+                onClick={() => navigate(`/case-studies/${p.id}`)}
+                style={{ '--accent': p.accentColor }}
+              >
+                View case study <ArrowRight size={13} />
+              </button>
+            </div>
           </div>
+
         </div>
       </div>
 
@@ -1105,7 +1218,7 @@ function ExperienceSection() {
 /* ─────────────────────────────────────────────────────────────────
    STICKY NAV — appears after intro card scrolls past viewport
 ───────────────────────────────────────────────────────────────── */
-function StickyNav({ activeSection, scrollTo, menuOpen, setMenuOpen, visible }) {
+function StickyNav({ activeSection, scrollTo, menuOpen, setMenuOpen, visible, theme, toggleTheme }) {
   return (
     <header
       className={`sticky-nav-wrap${visible ? ' sticky-nav-visible' : ''}`}
@@ -1128,8 +1241,13 @@ function StickyNav({ activeSection, scrollTo, menuOpen, setMenuOpen, visible }) 
           ))}
         </div>
         <div className="nav-actions">
-          <button className="btn small desktop-cta" onClick={() => scrollTo('contact')}>
-            Reach Out <ArrowRight size={14} />
+          <button
+            className="icon-btn theme-toggle"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          >
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           <button
             className="icon-btn mobile-menu"
@@ -1155,7 +1273,7 @@ function StickyNav({ activeSection, scrollTo, menuOpen, setMenuOpen, visible }) 
 /* ─────────────────────────────────────────────────────────────────
    INTRO CARD — editorial hero with integrated navigation
 ───────────────────────────────────────────────────────────────── */
-function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed }) {
+function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed, theme, toggleTheme }) {
   return (
     <div className="intro-card-wrap" id="home">
       <div className="intro-card">
@@ -1181,6 +1299,14 @@ function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed }) {
           </div>
 
           <div className="intro-nav-actions">
+            <button
+              className="icon-btn theme-toggle"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            >
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
             <button
               className="icon-btn mobile-menu"
               onClick={() => setMenuOpen(o => !o)}
@@ -1318,6 +1444,8 @@ function CaseStudyDetailPage() {
   useScrollReveal();
   const pct = useScrollProgress();
 
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
+
   const idx = projects.findIndex(p => p.id === id);
   if (idx === -1) return <Navigate to="/" replace />;
 
@@ -1446,6 +1574,7 @@ function MainPage() {
   const activeSection = useActiveSection(NAV_IDS);
   const typed         = useTypewriter(['APIs & backend systems.', 'ETL pipelines.', 'AI / LLM outputs.', 'databases & data flows.', 'payment gateways.', 'integrations.']);
   const introPast     = useIntroPast(introCardRef);
+  const [theme, toggleTheme] = useTheme();
 
   const scrollTo = useCallback(id => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -1476,6 +1605,8 @@ function MainPage() {
         menuOpen={menuOpen}
         setMenuOpen={setMenuOpen}
         visible={introPast}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
 
       {/* ── INTRO CARD (hero + embedded nav) ── */}
@@ -1486,6 +1617,8 @@ function MainPage() {
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
           typed={typed}
+          theme={theme}
+          toggleTheme={toggleTheme}
         />
       </div>
 
@@ -1552,7 +1685,7 @@ function MainPage() {
                 <h3>Testing an AI system beyond the answer on screen</h3>
                 <p>Tracing retrieval, MCP tool calls, data pipelines, logs, and failure patterns — rather than asserting on the final response.</p>
               </div>
-              <button className="btn gold"><BookOpen size={16} /> Read when published</button>
+              <span className="badge-coming-soon"><BookOpen size={13} /> Coming soon</span>
             </div>
           </div>
         </section>
@@ -1631,10 +1764,7 @@ function MainPage() {
                   <div><strong>30+</strong><span>Tools in stack</span></div>
                 </div>
                 <div className="resume-btns">
-                  <a className="btn" href="/Ankita_Nandal_SDET.pdf" target="_blank" rel="noreferrer">
-                    <ExternalLink size={16} /> View Resume
-                  </a>
-                  <a className="btn ghost" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
+                  <a className="btn" href="/Ankita_Nandal_SDET.pdf" download="Ankita_Nandal_SDET.pdf" rel="noreferrer">
                     <Download size={16} /> Download PDF
                   </a>
                 </div>
@@ -1660,7 +1790,7 @@ function MainPage() {
                     <BrandIcon icon={siGithub} size={18} color="var(--text)" /> GitHub
                   </a>
                   <a href="mailto:ankitanandal2009@gmail.com" aria-label="Send email">
-                    <BrandIcon icon={siGmail} size={18} color="#EA4335" /> ankitanandal2009@gmail.com
+                    <BrandIcon icon={siGmail} size={18} color="#EA4335" /> Gmail
                   </a>
                 </div>
 
@@ -1727,9 +1857,8 @@ function MainPage() {
       </main>
 
       <footer>
-        <div className="container footer">
+        <div className="container footer footer-center">
           <span className="footer-copy">© {new Date().getFullYear()} Ankita Nandal · SDET</span>
-          <span className="footer-copy">Built with React · ankitanandal.com</span>
         </div>
       </footer>
     </div>

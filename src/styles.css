@@ -21,6 +21,8 @@
   --panel:   #fff9f3;
   --panel2:  #f5ede0;
   --bg:      var(--cream);
+  --illus-bg: #ede8df;   /* case study preview visual background — light */
+  --illus-fg: #2c1a0e;   /* illustration label text — light */
   font-family: 'DM Sans', sans-serif;
   line-height: 1.55;
 }
@@ -548,27 +550,69 @@ img { max-width: 100%; display: block; }
   align-items:start;
 }
 
-/* Preview card */
+/* Preview card — split: theme-adaptive visual top, content bottom */
 .cs-preview { position:sticky;top:88px; }
 .cs-preview-card {
-  border:1.5px solid var(--beige2);border-radius:22px;
-  background:var(--panel);overflow:hidden;
+  border:1.5px solid var(--beige2);border-radius:20px;
+  background:var(--cream);overflow:hidden;
 }
-.cs-illus-wrap { border-bottom:1px solid var(--beige2); }
+
+/* Visual area */
+.cs-illus-wrap {
+  background:var(--illus-bg);overflow:hidden;
+  border-bottom:1px solid var(--beige2);
+}
+.cs-preview-svg { display:block;width:100%;height:auto; }
 .cs-illus { display:block;width:100%;height:auto; }
-.cs-preview-body { padding:26px 28px; }
+
+/* Content area */
+.cs-preview-body {
+  padding:24px 26px 26px;
+  display:flex;flex-direction:column;gap:14px;
+}
 .cs-eyebrow {
   display:block;font-weight:700;font-size:10.5px;
-  letter-spacing:.16em;text-transform:uppercase;margin-bottom:10px;
+  letter-spacing:.16em;text-transform:uppercase;
 }
 .cs-preview-title {
-  font-family:'Playfair Display';font-size:22px;line-height:1.28;
-  color:var(--brown);margin-bottom:12px;
+  font-family:'Manrope';font-size:19px;font-weight:800;line-height:1.28;
+  color:var(--brown);margin:0;
 }
 .cs-preview-summary {
-  color:var(--muted);font-size:14px;line-height:1.72;margin-bottom:16px;
+  color:var(--muted);font-size:13.5px;line-height:1.7;margin:0;
 }
-.cs-cta { margin-top:20px; }
+
+/* 3-tag row */
+.cs-tags { display:flex;flex-wrap:wrap;gap:7px; }
+.cs-tags span {
+  font-size:11.5px;font-weight:600;padding:4px 12px;
+  border-radius:999px;border:1px solid var(--beige2);
+  color:var(--muted);background:transparent;
+}
+
+/* Footer row: metric + CTA */
+.cs-preview-foot {
+  display:flex;align-items:center;
+  justify-content:space-between;gap:10px;
+  padding-top:2px;flex-wrap:wrap;
+}
+.cs-metric {
+  font-size:12px;font-weight:700;font-family:'Manrope';
+  display:flex;align-items:center;gap:6px;line-height:1.3;
+}
+.cs-cta-link {
+  display:inline-flex;align-items:center;gap:5px;
+  background:none;
+  border:1.5px solid var(--accent,var(--terra));
+  color:var(--accent,var(--terra));
+  font-size:12.5px;font-weight:700;font-family:'Manrope';
+  padding:6px 14px;border-radius:8px;
+  cursor:pointer;flex-shrink:0;white-space:nowrap;
+  transition:background .18s;
+}
+.cs-cta-link:hover {
+  background:color-mix(in srgb,var(--accent,var(--terra)) 10%,transparent);
+}
 
 /* Case study list */
 .cs-list {
