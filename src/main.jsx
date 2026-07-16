@@ -1445,9 +1445,23 @@ function CaseStudyDetailPage() {
 function MainPage() {
   const [menuOpen,   setMenuOpen]   = useState(false);
   const [form,       setForm]       = useState({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' });
+  const [touched,    setTouched]    = useState({ name: false, email: false, message: false });
   const [sent,       setSent]       = useState(false);
   const [sending,    setSending]    = useState(false);
   const [sendError,  setSendError]  = useState(false);
+
+  const isNameValid    = form.name.trim().length > 0;
+  const isEmailValid   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
+  const isMessageValid = form.message.trim().length > 0;
+  const isFormValid    = isNameValid && isEmailValid && isMessageValid;
+
+  const markTouched = field => setTouched(t => ({ ...t, [field]: true }));
+  const resetForm   = () => {
+    setForm({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' });
+    setTouched({ name: false, email: false, message: false });
+    setSent(false);
+    setSendError(false);
+  };
   const navigate = useNavigate();
   const introCardRef = useRef(null);
 
@@ -1465,10 +1479,12 @@ function MainPage() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setTouched({ name: true, email: true, message: true });
+    if (!isFormValid) return;
     setSending(true);
     setSendError(false);
     try {
-      const res  = await fetch('/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      const res  = await fetch('/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, name: form.name.trim(), email: form.email.trim(), message: form.message.trim() }) });
       const data = await res.json();
       if (data.success) setSent(true); else setSendError(true);
     } catch { setSendError(true); }
@@ -1685,20 +1701,36 @@ function MainPage() {
                   <CheckCircle2 size={44} strokeWidth={1.5} />
                   <h3>Sent.</h3>
                   <p>Your message landed in my inbox. I'll get back to you soon.</p>
-                  <button
-                    className="btn outline"
-                    onClick={() => { setSent(false); setSendError(false); setForm({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' }); }}
-                  >Send another</button>
+                  <button className="btn outline" onClick={resetForm}>Send another</button>
                 </div>
               ) : (
                 <form className="contact-form" onSubmit={handleSubmit} noValidate>
                   <label>
                     Name
-                    <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name" />
+                    <input
+                      value={form.name}
+                      onChange={e => setForm({ ...form, name: e.target.value })}
+                      onBlur={() => markTouched('name')}
+                      placeholder="Your name"
+                      aria-invalid={touched.name && !isNameValid}
+                    />
+                    {touched.name && !isNameValid && <span className="field-error">Name is required</span>}
                   </label>
                   <label>
                     Email
-                    <input required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@company.com" />
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={e => setForm({ ...form, email: e.target.value })}
+                      onBlur={() => markTouched('email')}
+                      placeholder="you@company.com"
+                      aria-invalid={touched.email && !isEmailValid}
+                    />
+                    {touched.email && !isEmailValid && (
+                      <span className="field-error">
+                        {form.email.trim() === '' ? 'Email is required' : 'Enter a valid email address'}
+                      </span>
+                    )}
                   </label>
                   <label>
                     Topic
@@ -1712,20 +1744,22 @@ function MainPage() {
                   <label>
                     Message
                     <textarea
-                      required
                       rows={5}
                       value={form.message}
                       onChange={e => setForm({ ...form, message: e.target.value })}
+                      onBlur={() => markTouched('message')}
                       placeholder={
                         form.topic === 'Discuss a QA opportunity'  ? 'Tell me about the role, team size, and what you are looking for in a QA engineer...' :
                         form.topic === 'Ask about my work'         ? 'Which project or area are you curious about? Happy to go deeper...' :
                         form.topic === 'Technical collaboration'   ? 'What are you building, and where does quality fit in? I would love to hear...' :
                                                                      'Go ahead — what is on your mind?'
                       }
+                      aria-invalid={touched.message && !isMessageValid}
                     />
+                    {touched.message && !isMessageValid && <span className="field-error">Message is required</span>}
                   </label>
                   {sendError && <p className="contact-error">Something went wrong — try again or reach me on LinkedIn.</p>}
-                  <button className="btn" type="submit" disabled={sending}>
+                  <button className="btn" type="submit" disabled={sending || !isFormValid}>
                     {sending ? 'Sending…' : <><span>Start a Conversation</span> <ArrowRight size={17} /></>}
                   </button>
                 </form>
