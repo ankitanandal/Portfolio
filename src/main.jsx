@@ -603,13 +603,13 @@ function useActiveSection(ids) {
 function useIntroPast(ref) {
   const [past, setPast] = useState(false);
   useEffect(() => {
-    if (!ref.current) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setPast(!entry.isIntersecting),
-      { threshold: 0, rootMargin: '0px' }
-    );
-    io.observe(ref.current);
-    return () => io.disconnect();
+    const check = () => {
+      if (!ref.current) return;
+      setPast(ref.current.getBoundingClientRect().bottom <= 66);
+    };
+    check();
+    window.addEventListener('scroll', check, { passive: true });
+    return () => window.removeEventListener('scroll', check);
   }, [ref]);
   return past;
 }
