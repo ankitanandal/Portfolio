@@ -1468,7 +1468,7 @@ function MainPage() {
     setSending(true);
     setSendError(false);
     try {
-      const res  = await fetch('http://localhost:3001/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      const res  = await fetch('/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const data = await res.json();
       if (data.success) setSent(true); else setSendError(true);
     } catch { setSendError(true); }
@@ -1686,7 +1686,7 @@ function MainPage() {
                   <h3>Sent.</h3>
                   <p>Your message landed in my inbox. I'll get back to you soon.</p>
                   <button
-                    className="btn ghost"
+                    className="btn outline"
                     onClick={() => { setSent(false); setSendError(false); setForm({ name: '', email: '', topic: 'Discuss a QA opportunity', message: '' }); }}
                   >Send another</button>
                 </div>
