@@ -1135,67 +1135,9 @@ function StickyNav({ activeSection, scrollTo, menuOpen, setMenuOpen, visible, th
 /* ─────────────────────────────────────────────────────────────────
    INTRO CARD — editorial hero with integrated navigation
 ───────────────────────────────────────────────────────────────── */
-function IntroCard({ activeSection, scrollTo, menuOpen, setMenuOpen, typed, theme, toggleTheme }) {
+function IntroCard({ scrollTo, typed }) {
   return (
     <div id="home" className="hero-page">
-
-      {/* ── TOP NAV BAR ── */}
-      <header className="hero-nav-bar">
-        <div className="container hero-nav-inner">
-          <button className="hero-brand" onClick={() => scrollTo('home')} aria-label="Go to top">
-            <span className="hero-brand-mark" aria-hidden="true">
-              <CheckCircle2 size={16} />
-            </span>
-          </button>
-
-          <nav className="hero-nav-links desktop-nav" aria-label="Main navigation">
-            {navItems.map(([id, label]) => (
-              <button
-                key={id}
-                onClick={() => scrollTo(id)}
-                className={activeSection === id ? 'hero-nav-active' : ''}
-                aria-current={activeSection === id ? 'location' : undefined}
-              >
-                {label}
-              </button>
-            ))}
-          </nav>
-
-          <div className="hero-nav-actions">
-            <button
-              className="icon-btn theme-toggle"
-              onClick={toggleTheme}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-            >
-              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-            <span className="nav-sep desktop-cta" aria-hidden="true" />
-            <button
-              className="btn small desktop-cta"
-              onClick={() => scrollTo('contact')}
-            >
-              Reach Out <ArrowRight size={14} />
-            </button>
-            <button
-              className="icon-btn mobile-menu"
-              onClick={() => setMenuOpen(o => !o)}
-              aria-expanded={menuOpen}
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            >
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </div>
-
-        {menuOpen && (
-          <div className="mobile-panel" role="navigation" aria-label="Mobile navigation">
-            {navItems.map(([id, label]) => (
-              <button key={id} onClick={() => scrollTo(id)}>{label}</button>
-            ))}
-          </div>
-        )}
-      </header>
 
       {/* ── HERO BODY ── */}
       <div className="hero-body container">
@@ -1496,28 +1438,20 @@ function MainPage() {
       <div className="noise" />
       <div className="scroll-progress" style={{ width: `${pct}%` }} />
 
-      {/* ── STICKY NAV (appears after intro card scrolls away) ── */}
+      {/* ── STICKY NAV — always fixed at top ── */}
       <StickyNav
         activeSection={activeSection}
         scrollTo={scrollTo}
         menuOpen={menuOpen}
         setMenuOpen={setMenuOpen}
-        visible={introPast}
+        visible={true}
         theme={theme}
         toggleTheme={toggleTheme}
       />
 
-      {/* ── INTRO CARD (hero + embedded nav) ── */}
+      {/* ── INTRO CARD (hero) ── */}
       <div ref={introCardRef}>
-        <IntroCard
-          activeSection={activeSection}
-          scrollTo={scrollTo}
-          menuOpen={menuOpen}
-          setMenuOpen={setMenuOpen}
-          typed={typed}
-          theme={theme}
-          toggleTheme={toggleTheme}
-        />
+        <IntroCard scrollTo={scrollTo} typed={typed} />
       </div>
 
       <main>
