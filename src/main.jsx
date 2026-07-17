@@ -1182,7 +1182,7 @@ function IntroCard({ scrollTo, typed }) {
             <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer">
               <LinkedInIcon size={14} color="#0A66C2" /> LinkedIn
             </a>
-            <a href="https://github.com" target="_blank" rel="noreferrer">
+            <a href="https://github.com/ankitanandal" target="_blank" rel="noreferrer">
               <BrandIcon icon={siGithub} size={14} color="var(--text)" /> GitHub
             </a>
             <a href="mailto:ankitanandal2009@gmail.com">
@@ -1618,7 +1618,7 @@ function MainPage() {
                   <a href="https://www.linkedin.com/in/ankita-nandal-2b9567247" target="_blank" rel="noreferrer" aria-label="LinkedIn profile">
                     <LinkedInIcon size={18} color="#0A66C2" /> LinkedIn
                   </a>
-                  <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub profile">
+                  <a href="https://github.com/ankitanandal" target="_blank" rel="noreferrer" aria-label="GitHub profile">
                     <BrandIcon icon={siGithub} size={18} color="var(--text)" /> GitHub
                   </a>
                 </div>
