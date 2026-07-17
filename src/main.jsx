@@ -10,11 +10,11 @@ import {
   ShieldCheck, Sun, TestTube2, X, Zap, Webhook, Cloud,
 } from 'lucide-react';
 import {
-  siPython, siPytest, siSelenium,
+  siPython, siPytest,
   siPostman,
   siMysql, siPostgresql, siMongodb, siNeo4j, siPhpmyadmin,
   siAirbyte, siOpensearch, siElasticsearch,
-  siArgo, siDocker, siGit, siLinux,
+  siArgo, siDocker, siGit,
   siJira, siTestrail, siApachejmeter,
   siStripe, siAndroid, siIos,
   siGithub, siGmail,
@@ -363,7 +363,6 @@ const toolGroups = [
     { icon: PlaywrightIcon, n: 'Playwright'   },
     { icon: siPython,       n: 'Python'       },
     { icon: siPytest,       n: 'PyTest'       },
-    { icon: siSelenium,     n: 'Selenium'     },
     { icon: RainforestIcon, n: 'RainforestQA' },
     { icon: KatalonIcon,    n: 'Katalon'      },
   ]},
@@ -392,7 +391,6 @@ const toolGroups = [
     { icon: siArgo,   n: 'ArgoCD'              },
     { icon: siDocker, n: 'Docker'              },
     { icon: siGit,    n: 'Git'                 },
-    { icon: siLinux,  n: 'Linux'               },
   ]},
   { label: 'Test & Defect Management', color: '#c9a96e', tools: [
     { icon: siJira,     n: 'JIRA'     },
@@ -770,11 +768,11 @@ function MethodAccordion() {
    SKILLS SECTION — capability cards + collapsed tool accordion
 ───────────────────────────────────────────────────────────────── */
 const toolGroupMeta = {
-  'Automation':            { Icon: Code2,             desc: 'Playwright, Python, PyTest, Selenium — scalable test frameworks.' },
+  'Automation':            { Icon: Code2,             desc: 'Playwright, Python, PyTest, RainforestQA, Katalon — scalable test frameworks.' },
   'API & Integration':     { Icon: Webhook,            desc: 'Postman, REST APIs, Webhooks, OpenAI API.' },
   'Databases':             { Icon: Database,           desc: 'MySQL, PostgreSQL, MongoDB, Neo4j, phpMyAdmin.' },
   'Data, Search & ETL':    { Icon: GitBranch,          desc: 'Airbyte, OpenSearch, Elasticsearch, AWS Athena, SQL.' },
-  'Cloud & DevOps':        { Icon: Cloud,              desc: 'AWS, ArgoCD, Docker, Git, Linux.' },
+  'Cloud & DevOps':        { Icon: Cloud,              desc: 'AWS, ArgoCD, Docker, Git.' },
   'Test & Defect Mgmt':    { Icon: CheckCircle2,       desc: 'Jira, TestRail — full defect lifecycle management.' },
   'Performance & Mobile':  { Icon: Zap,                desc: 'JMeter, TestFlight, Android, iOS.' },
   'Payments':              { Icon: ShieldCheck,        desc: 'Stripe subscriptions, Nexio transactions, webhooks.' },
